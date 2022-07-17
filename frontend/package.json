@@ -1,0 +1,14 @@
+{
+    "name": "abh",
+    "version": "1.0.0",
+    "main": "abh.js",
+    "scripts": {
+        "start": "electron ."
+    },
+    "author": "abh",
+    "license": "ISC",
+    "description": "",
+    "dependencies": {
+        "electron": "^17.0.0"
+    }
+}

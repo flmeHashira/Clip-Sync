@@ -4,36 +4,33 @@ let count = 0;
 const socket = io('http://localhost:3000');
 
 socket.on('message', (msg) => {
-    appendText(msg)
-    console.log(msg)
+    CreatecardElemTxt(msg)
 })
 
 const { clipboard } = require('electron')
 let watcherId = null
 
 
-function appendText(msg) {
-    const list = document.querySelector('.txtbox');
-    if (count == 0) {
-        list.value = msg;
-        count++;
-        return
-    }
-    const list2 = document.querySelector('.cpy');
-    // console.log("Copied\n")
-    let elem = document.createElement('textarea');
-    elem.value = msg;
-    list2.appendChild(elem);
+const CreatecardElemTxt = (text) => {
+    let container = document.querySelector(".container");
+    let cardElem = `<div class="card">
+        <textarea readonly></textarea>
+    </div>`;
+    let block = document.createElement('div');
+    block.innerHTML = cardElem;
+    console.log(cardElem);
+    (block.lastElementChild).lastElementChild.innerHTML = text;
+    container.appendChild(block);
 }
 
 function textChanged(msg) {
 
-    appendText(msg)
+    CreatecardElemTxt(msg)
     socket.emit('message', msg);
 
 }
 
-function startMonitoringClipboard() {
+async function startMonitoringClipboard() {
     let previousText = clipboard.readText()
 
 
@@ -49,3 +46,10 @@ function startMonitoringClipboard() {
 }
 
 startMonitoringClipboard()
+
+let cards = document.querySelectorAll('.card');
+cards.forEach(card => {
+    card.addEventListener('click', () => {
+        alert("Copied");
+    })
+});

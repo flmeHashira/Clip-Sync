@@ -58,9 +58,9 @@ function clip() {
         }
 
     })
-    // win.webContents.openDevTools();
+    win.webContents.openDevTools();
     // win.loadFile('Main.html')
-    win.loadURL('https://characterization-or-tend-come.trycloudflare.com/')
+    win.loadURL('http://localhost:3000')
 
     win.on('minimize', function(event) {
         event.preventDefault()

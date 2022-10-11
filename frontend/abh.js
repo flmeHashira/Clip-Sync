@@ -1,32 +1,35 @@
 const electron = require('electron')
-const ipcMain = require('electron')
 const path = require('path')
-const { app, Menu, Tray } = electron
-const BrowserWindow = electron.BrowserWindow //for web page 
+const { app, Tray, Menu, nativeImage } = electron
+const BrowserWindow = electron.BrowserWindow
 
 
 let mainWindow;
 let tray
-app.on('ready', _ => {
-    tray = new Tray(path.join(__dirname, 'icon.jpg'))
+app.whenReady().then(() => {
+    const image = nativeImage.createFromPath(
+        path.join(__dirname, 'icon.jpg')
+    );
+    tray = new Tray(image.resize({ width: 16, height: 16 }));
     const contextMenu = Menu.buildFromTemplate([{
             label: 'Open Cliboard',
             click: () => clip()
         },
-        {
-            label: 'Start at startup',
+        // {
+        //     label: 'Start at startup',
 
-        },
-        {
-            label: 'About Us',
-            click: () => newwin()
-        },
+        // },
+        // {
+        //     label: 'About Us',
+        //     click: () => newwin()
+        // },
         {
             label: 'Exit application',
             click: () => callclose()
         }
     ])
     tray.setContextMenu(contextMenu)
+    tray.setToolTip('open clipboard history')
 });
 
 function newwin() {
@@ -50,7 +53,7 @@ function clip() {
         height: 500,
         autoHideMenuBar: true,
         closable: false,
-        maximizable: false,
+        maximizable: true,
         webPreferences: {
             nodeIntegration: true, // is default value after Electron v5
             contextIsolation: false, // protect against prototype pollution
@@ -59,7 +62,6 @@ function clip() {
 
     })
     win.webContents.openDevTools();
-    // win.loadFile('Main.html')
     win.loadURL('http://localhost:3000')
 
     win.on('minimize', function(event) {

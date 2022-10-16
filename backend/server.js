@@ -13,11 +13,9 @@ http.listen(PORT, () => {
 app.use(express.static(__dirname + '/public'))
 
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/Main.html');
+    res.send("Hello!");
 });
-app.get('/t', (req, res) => {
-    res.json({ Name: "Gourav", Title: "Jha" });
-})
+
 const io = require('socket.io')(http);
 io.on('connection', (socket) => {
     Nusers++;

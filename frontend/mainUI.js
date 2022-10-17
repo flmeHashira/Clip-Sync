@@ -7,9 +7,6 @@ socket.on('message', (msg) => {
     CreatecardElemTxt(msg)
 })
 
-// const { clipboard } = require('electron')
-// let watcherId = null
-
 
 const CreatecardElemTxt = (text) => {
     let container = document.querySelector(".container");
@@ -23,34 +20,12 @@ const CreatecardElemTxt = (text) => {
     container.appendChild(block);
 }
 
-// function textChanged(msg) {
-
-//     CreatecardElemTxt(msg)
-//     socket.emit('message', msg);
-
-// }
 
 ipc.on('text-changed', (evt, msg) => {
     console.log(msg)
     CreatecardElemTxt(msg)
 })
 
-// async function startMonitoringClipboard() {
-//     let previousText = clipboard.readText()
-
-
-//     const isDiffText = (str1, str2) => {
-//         return str2 && str1 !== str2
-//     }
-
-//     if (!watcherId) {
-//         watcherId = setInterval(() => {
-//             if (isDiffText(previousText, previousText = clipboard.readText(previousText))) textChanged(previousText)
-//         }, 500)
-//     }
-// }
-
-// startMonitoringClipboard()
 
 let cards = document.querySelectorAll('.card');
 cards.forEach(card => {

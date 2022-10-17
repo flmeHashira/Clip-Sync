@@ -1,5 +1,6 @@
 node_modules
-main.js
 .gitignore
-abh.css
-main.html
+myrealm.management
+myrealm
+myrealm.lock
+myrealm.note

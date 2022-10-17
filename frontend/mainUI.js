@@ -1,16 +1,14 @@
-let count = 0;
-
-
-const { io } = require("socket.io-client");
-
-const socket = io('http://localhost:3000');
+const { io } = require("socket.io-client")
+const socket = io('http://localhost:3000')
+const electron = require('electron')
+const ipc = electron.ipcRenderer
 
 socket.on('message', (msg) => {
     CreatecardElemTxt(msg)
 })
 
-const { clipboard } = require('electron')
-let watcherId = null
+// const { clipboard } = require('electron')
+// let watcherId = null
 
 
 const CreatecardElemTxt = (text) => {
@@ -25,29 +23,34 @@ const CreatecardElemTxt = (text) => {
     container.appendChild(block);
 }
 
-function textChanged(msg) {
+// function textChanged(msg) {
 
+//     CreatecardElemTxt(msg)
+//     socket.emit('message', msg);
+
+// }
+
+ipc.on('text-changed', (evt, msg) => {
+    console.log(msg)
     CreatecardElemTxt(msg)
-    socket.emit('message', msg);
+})
 
-}
-
-async function startMonitoringClipboard() {
-    let previousText = clipboard.readText()
+// async function startMonitoringClipboard() {
+//     let previousText = clipboard.readText()
 
 
-    const isDiffText = (str1, str2) => {
-        return str2 && str1 !== str2
-    }
+//     const isDiffText = (str1, str2) => {
+//         return str2 && str1 !== str2
+//     }
 
-    if (!watcherId) {
-        watcherId = setInterval(() => {
-            if (isDiffText(previousText, previousText = clipboard.readText(previousText))) textChanged(previousText)
-        }, 500)
-    }
-}
+//     if (!watcherId) {
+//         watcherId = setInterval(() => {
+//             if (isDiffText(previousText, previousText = clipboard.readText(previousText))) textChanged(previousText)
+//         }, 500)
+//     }
+// }
 
-startMonitoringClipboard()
+// startMonitoringClipboard()
 
 let cards = document.querySelectorAll('.card');
 cards.forEach(card => {

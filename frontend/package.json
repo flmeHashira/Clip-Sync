@@ -1,7 +1,7 @@
 {
-    "name": "abh",
+    "name": "Clip-Sync",
     "version": "1.0.0",
-    "main": "abh.js",
+    "main": "index.js",
     "scripts": {
         "start": "electron ."
     },
@@ -10,6 +10,7 @@
     "description": "",
     "dependencies": {
         "electron": "^21.1.1",
+        "realm": "^10.21.1",
         "socket.io-client": "^4.5.3"
     }
 }

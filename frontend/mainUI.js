@@ -2,6 +2,7 @@ const { io } = require("socket.io-client")
 const socket = io('http://localhost:3000')
 const electron = require('electron')
 const ipc = electron.ipcRenderer
+const Realm = require("realm")
 
 socket.on('message', (msg) => {
     CreatecardElemTxt(msg)

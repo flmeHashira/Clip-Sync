@@ -1,18 +1,20 @@
+require('dotenv').config();
 const electron = require('electron')
 const clipboard = electron.clipboard
 const path = require('path')
 const { app, Tray, Menu, nativeImage } = electron
 const BrowserWindow = electron.BrowserWindow
 const Realm = require("realm")
-const { UUID } = Realm.BSON
+const { UUID } = Realm.BSON;
 const crypto = require('crypto')
 const ipcMain = require('electron').ipcMain
 
 
-let win
-let tray
+let tray, win;
 
-//Realm Database
+//Realm Local Database
+const realmApp = new Realm.App({ id: "clip-sync-ehley" });
+
 
 const Schema = {
     name: "clipContent",
@@ -23,30 +25,44 @@ const Schema = {
         SHA: { type: "string", indexed: true },
     },
     primaryKey: "_id",
+    sync: {
+        user: realmApp.currentUser,
+        flexible: true,
+    },
 };
-
 
 const realm = new Realm({
     path: "myrealm",
     schema: [Schema],
-    deleteRealmIfMigrationNeeded: true
+    deleteRealmIfMigrationNeeded: true,
 });
+const syncSession = realm.syncSession;
 
-// realm.write(() => {
-//     // Delete all instances of Cat from the realm.
-//     realm.delete(realm.objects("clipContent"));
-// });
+//Realm Auth
+async function RealmAuths() {
+    const email = process.env.email;
+    const password = process.env.password;
 
-function checkifRealmEmpty(realm, query) {
-    return realm.objects(query).length;
+    // Create an email/password credential
+    const credentials = Realm.Credentials.emailPassword(
+        email,
+        password
+    );
+    try {
+        const user = await realmApp.logIn(credentials);
+        console.log("Successfully logged in!", user.id);
+        return user;
+    } catch (err) {
+        console.error("Failed to log in", err.message);
+    }
 }
 
+//Electron Window Functions
 app.whenReady().then(() => {
     createWindow()
+    RealmAuths()
 });
 
-
-//Electron Window Functions
 function newwin() {
     win = new BrowserWindow({
         minheight: 640,
@@ -66,10 +82,21 @@ function createWindow() {
             label: 'Open Cliboard',
             click: () => clip()
         },
-        // {
-        //     label: 'Start at startup',
+        {
+            label: 'Clear History',
+            click: () => clearHistory()
 
-        // },
+        },
+        {
+            label: 'Pause',
+            click: () => { syncSession.pause() }
+
+        },
+        {
+            label: 'Resume Sync',
+            click: () => { syncSession.resume() }
+
+        },
         // {
         //     label: 'About Us',
         //     click: () => newwin()
@@ -86,7 +113,7 @@ function createWindow() {
 
 function clip() {
 
-    win = new BrowserWindow({
+    let win = new BrowserWindow({
         minheight: 500,
         minwidth: 420,
         // maxHeight: 500,
@@ -96,6 +123,7 @@ function clip() {
         autoHideMenuBar: true,
         closable: false,
         maximizable: true,
+        closable: true,
         webPreferences: {
             nodeIntegration: true, // is default value after Electron v5
             contextIsolation: false, // protect against prototype pollution
@@ -106,20 +134,33 @@ function clip() {
     win.webContents.openDevTools();
     win.loadFile('Main.html')
     win.once('ready-to-show', () => {
-        if (checkifRealmEmpty(realm, "clipContent")) {
+        if (!realm.empty) {
             let list = realm.objects("clipContent")
             list.forEach((element) => {
                 win.webContents.send('text-changed', element.value)
-                console.log(element.value)
             })
         }
     })
+    win.on('close', (event) => {
+        if (!app.isQuiting) {
+            event.preventDefault();
+            win.hide();
+        }
+
+    })
+
     win.on('minimize', (event) => {
         event.preventDefault()
         win.hide()
     })
 }
 
+function clearHistory() {
+    realm.write(() => {
+        // Delete all instances of Cat from the realm.
+        realm.delete(realm.objects("clipContent"));
+    });
+}
 
 function callclose() {
     clearInterval(watcherId)

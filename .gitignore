@@ -4,3 +4,6 @@ myrealm.management
 myrealm
 myrealm.lock
 myrealm.note
+.env
+myrealm.management
+mongodb-realm

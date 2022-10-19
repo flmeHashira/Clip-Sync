@@ -36,7 +36,6 @@ const realm = new Realm({
     schema: [Schema],
     deleteRealmIfMigrationNeeded: true,
 });
-const syncSession = realm.syncSession;
 
 //Realm Auth
 async function RealmAuths() {
@@ -56,6 +55,8 @@ async function RealmAuths() {
         console.error("Failed to log in", err.message);
     }
 }
+
+const syncSession = realm.syncSession;
 
 //Electron Window Functions
 app.whenReady().then(() => {

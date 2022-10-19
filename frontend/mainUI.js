@@ -3,7 +3,6 @@ const socket = io('http://localhost:3000')
 const electron = require('electron')
 const ipc = electron.ipcRenderer
 const Realm = require("realm")
-const { Collection } = require("realm")
 
 socket.on('message', (msg) => {
     CreatecardElemTxt(msg)
@@ -57,7 +56,7 @@ try {
 
 //Insert data to DOM
 
-const CreatecardElemTxt = (text) => {
+const CreatecardElemTxt = async(text) => {
     let container = document.querySelector(".container");
     let cardElem = `<div class="card">
         <textarea readonly></textarea>

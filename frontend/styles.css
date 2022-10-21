@@ -13,31 +13,8 @@
 }
 
 body {
-    /* background-color: #eff3ff; */
+    background-color: #eff3ff;
     background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    height: 100%;
-    overflow: hidden;
-}
-
-.card img {
-    display: block;
-    width: 100%;
-}
-
-.cardIMG {
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    min-width: fit-content;
-    max-width: 200px;
-    aspect-ratio: 1 / 0.5;
-    border-radius: 1rem;
-    background: white;
-    margin: 1.5rem;
-    box-shadow: -10px -10px 15px rgba(255, 255, 255, 0.5), 10px 10px 15px rgba(70, 70, 70, 0.12);
-    transition: 0.3s;
-    background-image: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
 }
 
 .contents {
@@ -46,6 +23,7 @@ body {
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-around;
+    padding-top: 3rem;
 }
 
 textarea {
@@ -65,22 +43,6 @@ textarea {
     scrollbar-width: none;
 }
 
-#header {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    height: 300px;
-    width: 100%;
-    margin-top: 10px;
-    margin-bottom: 20px;
-    border: solid black;
-}
-
-#header>* {
-    padding: 30px;
-}
-
 .container {
     display: flex;
     flex-direction: row;
@@ -88,8 +50,7 @@ textarea {
     align-items: flex-start;
     justify-content: center;
     width: 95%;
-    margin-top: 30px;
-    overflow-y: auto;
+    /* overflow-y: auto; */
 }
 
 .card {
@@ -110,23 +71,7 @@ textarea {
     scrollbar-width: none;
 }
 
-.cardImg {
-    width: 100%;
-}
-
 .card:hover {
     transform: scale(1.1);
     border: 2px solid rgb(71, 71, 71);
-}
-
-.button {
-    display: block;
-    font-size: 18px;
-    padding: auto;
-    background-color: #101010;
-    color: #fdfbfb;
-    position: relative;
-    margin-left: 100px;
-    border: none;
-    border-radius: 5px;
 }

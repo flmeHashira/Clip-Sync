@@ -61,7 +61,7 @@ const syncSession = realm.syncSession;
 //Electron Window Functions
 app.whenReady().then(() => {
     createWindow()
-    RealmAuths()
+        // RealmAuths()
 });
 
 function newwin() {

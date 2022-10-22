@@ -78,22 +78,26 @@ const createCardIMG = async(imgSrc) => {
     let cardElem = `<div class="card"><img src="" alt=""></div>`;
     let block = document.createElement('div')
     block.innerHTML = cardElem;
-    (block.lastElementChild).lastElementChild.src = imgSrc
-
     let parent = block.lastElementChild;
-    let myImg = await parent.lastElementChild;
-    console.log(myImg.naturalHeight);
-    let ratio = myImg.naturalWidth / myImg.naturalHeight;
+    let myImg = parent.lastElementChild;
+    let ratio;
+    myImg.addEventListener('load', (event) => {
+        ratio = myImg.naturalWidth / myImg.naturalHeight;
+        console.log(ratio);
+        if (ratio < 0.75) {
+            parent.style.maxWidth = '200px';
+
+        }
+        if (ratio > 1.4) {
+            parent.style.maxWidth = '400px'
+        }
+    });
+    // add logo to the document
     // (parent.lastElementChild).style.aspectRatio = `${ratio}`;
     // console.log(1 / ratio)
-    if (ratio < 0.75) {
-        parent.style.maxWidth = '200px';
-
-    }
-    if (ratio > 1.3) {
-        parent.style.maxWidth = '500px'
-    }
     container.appendChild(block);
+    (block.lastElementChild).lastElementChild.src = imgSrc
+
 }
 
 createCardIMG(img1)

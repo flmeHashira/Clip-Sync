@@ -4,10 +4,9 @@ const electron = require('electron')
 const ipc = electron.ipcRenderer
 const Realm = require("realm")
 
-socket.on('message', (msg) => {
-    CreatecardElemTxt(msg)
-})
-
+// socket.on('message', (msg) => {
+//     CreatecardElemTxt(msg)
+// })
 
 //Watch for changes in database
 
@@ -35,9 +34,12 @@ function onClipChange(clipContent, changes) {
     // Handle newly inserted clipboard content
     changes.insertions.forEach((index) => {
         const insertedData = clipContent[index]
-        let msg = insertedData.value
-        console.log("\nMessage is:" + msg)
-        CreatecardElemTxt(msg)
+        let msg = insertedData.value;
+        let type = insertedData.type;
+        if (type == "text")
+            createCardTxt(msg);
+        else
+            createCardIMG(msg);
 
     });
     // Handle clipboard objects that were modified
@@ -60,7 +62,7 @@ const img1 = "https://images.unsplash.com/photo-1619024370140-d625f2e354f8?ixlib
 const img2 = "https://images.unsplash.com/photo-1514589553259-ed2658dad420?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3016&q=80"
 const img3 = "https://i.imgur.com/Ji9Ge19.jpg";
 
-const CreatecardElemTxt = async(text) => {
+const createCardTxt = async(text) => {
     let container = document.querySelector(".container");
     let cardElem = `<div class="card">
         <textarea readonly></textarea>
@@ -100,14 +102,17 @@ const createCardIMG = async(imgSrc) => {
 
 }
 
-createCardIMG(img1)
-createCardIMG(img2)
-createCardIMG(img3)
+// createCardIMG(img1)
+// createCardIMG(img2)
+// createCardIMG(img3)
 
 
 ipc.on('text-changed', (evt, msg) => {
     console.log(msg)
-    CreatecardElemTxt(msg)
+    createCardTxt(msg)
+})
+ipc.on('image-changed', (evt, msg) => {
+    createCardIMG(msg)
 })
 
 

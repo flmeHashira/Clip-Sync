@@ -138,7 +138,10 @@ function clip() {
         if (!realm.empty) {
             let list = realm.objects("clipContent")
             list.forEach((element) => {
-                win.webContents.send('text-changed', element.value)
+                if (element.type == "text")
+                    win.webContents.send('text-changed', element.value)
+                else
+                    win.webContents.send('image-changed', element.value)
             })
         }
     })
@@ -193,7 +196,7 @@ async function startMonitoringClipboard() {
 
         if (imageHasDiff(image, lastImage)) {
             lastImage = image
-            console.log("Image changed")
+            imageChanged(image.toDataURL());
         }
 
         if (textHasDiff(text, lastText)) {
@@ -220,5 +223,21 @@ async function textChanged(text) {
         });
     });
     win.webContents.send('text-changed', text)
+
+}
+
+async function imageChanged(image) {
+    const hash = crypto.createHash('sha256')
+    let hashData = await hash.update(image, 'utf-8');
+    realm.write(async() => {
+        // Assign a newly-created instance to the variable.
+        realm.create("clipContent", {
+            _id: new UUID(),
+            type: "image",
+            value: image,
+            SHA: hashData.digest('hex')
+        });
+    });
+    win.webContents.send('image-changed', image)
 
 }

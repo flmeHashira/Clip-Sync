@@ -16,7 +16,6 @@ const Schema = {
         _id: "uuid",
         type: "string",
         value: "string",
-        SHA: { type: "string", indexed: true },
     },
     primaryKey: "_id",
 };

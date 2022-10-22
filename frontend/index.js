@@ -5,12 +5,10 @@ const path = require('path')
 const { app, Tray, Menu, nativeImage } = electron
 const BrowserWindow = electron.BrowserWindow
 const Realm = require("realm")
-const { UUID } = Realm.BSON;
-const crypto = require('crypto')
 const ipcMain = require('electron').ipcMain
 
 
-let tray, win;
+let tray, mainWindow, workerWindow;
 
 //Realm Local Database
 const realmApp = new Realm.App({ id: "clip-sync-ehley" });
@@ -22,7 +20,6 @@ const Schema = {
         _id: "uuid",
         type: "string",
         value: "string",
-        SHA: { type: "string", indexed: true },
     },
     primaryKey: "_id",
     sync: {
@@ -60,18 +57,19 @@ const syncSession = realm.syncSession;
 
 //Electron Window Functions
 app.whenReady().then(() => {
+    helperWindow()
     createWindow()
         // RealmAuths()
 });
 
 function newwin() {
-    win = new BrowserWindow({
+    mainWindow = new BrowserWindow({
         minheight: 640,
         minwidth: 800,
         maxheight: 640,
         maxwidth: 800,
     });
-    win.loadFile('main.html')
+    mainWindow.loadFile('main.html')
 }
 
 function createWindow() {
@@ -108,13 +106,26 @@ function createWindow() {
         }
     ])
     tray.setContextMenu(contextMenu)
-    startMonitoringClipboard()
     tray.setToolTip('open clipboard history')
+}
+
+function helperWindow() {
+    // create hidden worker window
+    workerWindow = new BrowserWindow({
+        show: false,
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false,
+
+        }
+    });
+    workerWindow.webContents.openDevTools();
+    workerWindow.loadFile('worker.html');
 }
 
 function clip() {
 
-    let win = new BrowserWindow({
+    let mainWindow = new BrowserWindow({
         minheight: 500,
         minwidth: 420,
         // maxHeight: 500,
@@ -132,112 +143,41 @@ function clip() {
         }
 
     })
-    win.webContents.openDevTools();
-    win.loadFile('Main.html')
-    win.once('ready-to-show', () => {
+    mainWindow.webContents.openDevTools();
+    mainWindow.loadFile('Main.html')
+    mainWindow.once('ready-to-show', () => {
         if (!realm.empty) {
             let list = realm.objects("clipContent")
             list.forEach((element) => {
                 if (element.type == "text")
-                    win.webContents.send('text-changed', element.value)
+                    mainWindow.webContents.send('text-changed', element.value)
                 else
-                    win.webContents.send('image-changed', element.value)
+                    mainWindow.webContents.send('image-changed', element.value)
             })
         }
     })
-    win.on('close', (event) => {
+    mainWindow.on('close', (event) => {
         if (!app.isQuiting) {
             event.preventDefault();
-            win.hide();
+            mainWindow.hide();
         }
 
     })
 
-    win.on('minimize', (event) => {
+    mainWindow.on('minimize', (event) => {
         event.preventDefault()
-        win.hide()
+        mainWindow.hide()
     })
 }
 
 function clearHistory() {
     realm.write(() => {
-        // Delete all instances of Cat from the realm.
         realm.delete(realm.objects("clipContent"));
     });
 }
 
 function callclose() {
-    clearInterval(watcherId)
     realm.close();
-    win = null
+    mainWindow = null
     app.exit()
-}
-
-
-//Clipboard Monitoring Starts here
-
-function imageHasDiff(a, b) {
-    return !a.isEmpty() && b.toDataURL() !== a.toDataURL()
-}
-
-function textHasDiff(a, b) {
-    return a && b !== a
-}
-
-let watcherId = null;
-async function startMonitoringClipboard() {
-    const watchDelay = 800;
-    let lastText = clipboard.readText()
-    let lastImage = clipboard.readImage()
-
-    watcherId = setInterval(() => {
-        const text = clipboard.readText()
-        const image = clipboard.readImage()
-
-        if (imageHasDiff(image, lastImage)) {
-            lastImage = image
-            imageChanged(image.toDataURL());
-        }
-
-        if (textHasDiff(text, lastText)) {
-            lastText = text
-            textChanged(text)
-            console.log("text changed")
-        }
-    }, watchDelay)
-}
-
-
-//Clipboard Change Events
-
-async function textChanged(text) {
-    const hash = crypto.createHash('sha256')
-    let hashData = await hash.update(text, 'utf-8');
-    realm.write(async() => {
-        // Assign a newly-created instance to the variable.
-        realm.create("clipContent", {
-            _id: new UUID(),
-            type: "text",
-            value: text,
-            SHA: hashData.digest('hex')
-        });
-    });
-    win.webContents.send('text-changed', text)
-
-}
-
-async function imageChanged(image) {
-    const hash = crypto.createHash('sha256')
-    let hashData = await hash.update(image, 'utf-8');
-    realm.write(async() => {
-        // Assign a newly-created instance to the variable.
-        realm.create("clipContent", {
-            _id: new UUID(),
-            type: "image",
-            value: image,
-            SHA: hashData.digest('hex')
-        });
-    });
-    win.webContents.send('image-changed', image)
-
 }

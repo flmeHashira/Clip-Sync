@@ -86,9 +86,7 @@ textarea {
     flex-direction: column;
     overflow: hidden;
     min-width: fit-content;
-    /* max-width: 800px; */
-    /* aspect-ratio: 1 / 0.5; */
-    /* aspect-ratio: 1; */
+    max-width: 300px;
     border-radius: 1rem;
     background: white;
     margin: 1.5rem;

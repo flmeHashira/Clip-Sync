@@ -56,6 +56,10 @@ try {
 
 //Insert data to DOM
 
+const img1 = "https://images.unsplash.com/photo-1619024370140-d625f2e354f8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=987&q=80"
+const img2 = "https://images.unsplash.com/photo-1514589553259-ed2658dad420?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3016&q=80"
+const img3 = "https://i.imgur.com/Ji9Ge19.jpg";
+
 const CreatecardElemTxt = async(text) => {
     let container = document.querySelector(".container");
     let cardElem = `<div class="card">
@@ -63,10 +67,38 @@ const CreatecardElemTxt = async(text) => {
     </div>`;
     let block = document.createElement('div');
     block.innerHTML = cardElem;
-    console.log(cardElem);
+    // console.log(cardElem);
     (block.lastElementChild).lastElementChild.innerHTML = text;
     container.appendChild(block);
 }
+
+
+const createCardIMG = async(imgSrc) => {
+    let container = document.querySelector(".container")
+    let cardElem = `<div class="card"><img src="" alt=""></div>`;
+    let block = document.createElement('div')
+    block.innerHTML = cardElem;
+    (block.lastElementChild).lastElementChild.src = imgSrc
+
+    let parent = block.lastElementChild;
+    let myImg = await parent.lastElementChild;
+    console.log(myImg.naturalHeight);
+    let ratio = myImg.naturalWidth / myImg.naturalHeight;
+    // (parent.lastElementChild).style.aspectRatio = `${ratio}`;
+    // console.log(1 / ratio)
+    if (ratio < 0.75) {
+        parent.style.maxWidth = '200px';
+
+    }
+    if (ratio > 1.3) {
+        parent.style.maxWidth = '500px'
+    }
+    container.appendChild(block);
+}
+
+createCardIMG(img1)
+createCardIMG(img2)
+createCardIMG(img3)
 
 
 ipc.on('text-changed', (evt, msg) => {

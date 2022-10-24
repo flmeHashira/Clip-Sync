@@ -1,8 +1,6 @@
-const { io } = require("socket.io-client")
-const socket = io('http://localhost:3000')
 const electron = require('electron')
+const { app, Tray, Menu, nativeImage } = electron
 const ipc = electron.ipcRenderer
-const Realm = require("realm")
 
 // socket.on('message', (msg) => {
 //     CreatecardElemTxt(msg)
@@ -10,49 +8,21 @@ const Realm = require("realm")
 
 //Watch for changes in database
 
-const Schema = {
-    name: "clipContent",
-    properties: {
-        _id: "uuid",
-        type: "string",
-        value: "string",
-    },
-    primaryKey: "_id",
-};
+// const Schema = {
+//     name: "clipContent",
+//     properties: {
+//         _id: "uuid",
+//         type: "string",
+//         value: "string",
+//     },
+//     primaryKey: "_id",
+// };
 
-const realm = new Realm({
-    path: "myrealm",
-    schema: [Schema],
-    deleteRealmIfMigrationNeeded: true,
-});
-
-const clipContent = realm.objects("clipContent")
-
-function onClipChange(clipContent, changes) {
-    changes.deletions.forEach((index) => {});
-    // Handle newly inserted clipboard content
-    changes.insertions.forEach((index) => {
-        const insertedData = clipContent[index]
-        let msg = insertedData.value;
-        let type = insertedData.type;
-        if (type == "text")
-            createCardTxt(msg);
-        else
-            createCardIMG(msg);
-
-    });
-    // Handle clipboard objects that were modified
-    changes.modifications.forEach((index) => {});
-    //Order of handling event matters
-}
-
-try {
-    clipContent.addListener(onClipChange);
-} catch (error) {
-    console.error(
-        `An exception was thrown within the change listener: ${error}`
-    );
-}
+// const realm = new Realm({
+//     path: "myrealm",
+//     schema: [Schema],
+//     deleteRealmIfMigrationNeeded: true,
+// });
 
 
 //Insert data to DOM

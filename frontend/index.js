@@ -1,76 +1,20 @@
-require('dotenv').config();
 const electron = require('electron')
-const clipboard = electron.clipboard
-const path = require('path')
 const { app, Tray, Menu, nativeImage } = electron
+const path = require('path')
 const BrowserWindow = electron.BrowserWindow
-const Realm = require("realm")
-const ipcMain = require('electron').ipcMain
-
+const ipcMain = require('electron').ipcMain;
 
 let tray, mainWindow, workerWindow;
 
-//Realm Local Database
-const realmApp = new Realm.App({ id: "clip-sync-ehley" });
-
-
-const Schema = {
-    name: "clipContent",
-    properties: {
-        _id: "uuid",
-        type: "string",
-        value: "string",
-    },
-    primaryKey: "_id",
-    sync: {
-        user: realmApp.currentUser,
-        flexible: true,
-    },
-};
-
-const realm = new Realm({
-    path: "myrealm",
-    schema: [Schema],
-    deleteRealmIfMigrationNeeded: true,
-});
-
-//Realm Auth
-async function RealmAuths() {
-    const email = process.env.email;
-    const password = process.env.password;
-
-    // Create an email/password credential
-    const credentials = Realm.Credentials.emailPassword(
-        email,
-        password
-    );
-    try {
-        const user = await realmApp.logIn(credentials);
-        console.log("Successfully logged in!", user.id);
-        return user;
-    } catch (err) {
-        console.error("Failed to log in", err.message);
-    }
+async function startApp() {
+    createWindow();
+    helperWindow();
+    workerWindow.webContents.send('start-auth', "demo")
 }
 
-const syncSession = realm.syncSession;
 
 //Electron Window Functions
-app.whenReady().then(() => {
-    helperWindow()
-    createWindow()
-        // RealmAuths()
-});
-
-function newwin() {
-    mainWindow = new BrowserWindow({
-        minheight: 640,
-        minwidth: 800,
-        maxheight: 640,
-        maxwidth: 800,
-    });
-    mainWindow.loadFile('main.html')
-}
+app.whenReady().then(startApp)
 
 function createWindow() {
     const image = nativeImage.createFromPath(
@@ -83,23 +27,25 @@ function createWindow() {
         },
         {
             label: 'Clear History',
-            click: () => clearHistory()
+            click: () => {
+                workerWindow.webContents.send('clear-history')
+            }
 
         },
         {
             label: 'Pause',
-            click: () => { syncSession.pause() }
+            click: () => {
+                workerWindow.webContents.send('pause-history');
+            }
 
         },
         {
             label: 'Resume Sync',
-            click: () => { syncSession.resume() }
+            click: () => {
+                workerWindow.webContents.send('resume-history');
+            }
 
         },
-        // {
-        //     label: 'About Us',
-        //     click: () => newwin()
-        // },
         {
             label: 'Exit application',
             click: () => callclose()
@@ -112,10 +58,11 @@ function createWindow() {
 function helperWindow() {
     // create hidden worker window
     workerWindow = new BrowserWindow({
-        show: false,
+        show: true,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
+            enableRemoteModule: true
 
         }
     });
@@ -146,15 +93,7 @@ function clip() {
     mainWindow.webContents.openDevTools();
     mainWindow.loadFile('Main.html')
     mainWindow.once('ready-to-show', () => {
-        if (!realm.empty) {
-            let list = realm.objects("clipContent")
-            list.forEach((element) => {
-                if (element.type == "text")
-                    mainWindow.webContents.send('text-changed', element.value)
-                else
-                    mainWindow.webContents.send('image-changed', element.value)
-            })
-        }
+        workerWindow.webContents.send('load-all-prev');
     })
     mainWindow.on('close', (event) => {
         if (!app.isQuiting) {
@@ -168,16 +107,17 @@ function clip() {
         event.preventDefault()
         mainWindow.hide()
     })
+    ipcMain.on('text-changed', (event, text) => {
+        mainWindow.webContents.send('text-changed', text)
+    })
+
+    ipcMain.on('image-changed', (event, image) => {
+        mainWindow.webContents.send('image-changed', image)
+    })
 }
 
-function clearHistory() {
-    realm.write(() => {
-        realm.delete(realm.objects("clipContent"));
-    });
-}
-
-function callclose() {
-    realm.close();
+async function callclose() {
+    await workerWindow.webContents.send('close-realm')
     mainWindow = null
     app.exit()
 }

@@ -3,25 +3,93 @@ const clipboard = electron.clipboard
 const Realm = require("realm")
 const { UUID } = Realm.BSON;
 const ipc = electron.ipcRenderer
+const realmAPI = require('./realmAPIs')
+
+//Realm Implementation
+
+const realms = {};
+let userID, syncSession;
+
+//Realm User Auth
+async function realmAuth() {
+    const user = await realmAPI.RealmAuths(1);
+    userID = user.id;
+    realms[userID] = await realmAPI.openRealm(user)
+    syncSession = realms[userID].syncSession;
+    await realmAPI.addSubscription(realms[userID], realms[userID].objects("clipContent"))
+}
+
+//Watch for Updates in Database
+function watchUpdates() {
+    const clipContent = realms[userID].objects("clipContent")
+    try {
+        clipContent.addListener(onClipChange);
+    } catch (error) {
+        console.error(
+            `An exception was thrown within the change listener: ${error}`
+        );
+    }
+}
 
 
-const Schema = {
-    name: "clipContent",
-    properties: {
-        _id: "uuid",
-        type: "string",
-        value: "string",
-    },
-    primaryKey: "_id",
-};
+function onClipChange(clipContent, changes) {
+    changes.deletions.forEach((index) => {});
+    // Handle newly inserted clipboard content
+    changes.insertions.forEach((index) => {
+        const insertedData = clipContent[index]
+        let msg = insertedData.value;
+        let type = insertedData.type;
+        if (type == "text")
+            ipc.send('text-changed', msg)
+        else
+            ipc.send('image-changed', msg)
 
-const realm = new Realm({
-    path: "myrealm",
-    schema: [Schema],
-    deleteRealmIfMigrationNeeded: true,
-});
+    });
+    // Handle clipboard objects that were modified
+    changes.modifications.forEach((index) => {});
+    //Order of handling event matters
+}
 
-console.log(clipboard.readText())
+
+
+ipc.on('close-realm', () => {
+    realms[userID].close()
+})
+
+ipc.on('clear-history', () => {
+    realmAPI.clearDatabase(realms[userID]);
+})
+
+ipc.on('pause-history', () => {
+    syncSession.pause()
+})
+ipc.on('resume-history', () => {
+    syncSession.resume()
+})
+
+
+ipc.on('start-auth', async() => {
+    console.log("starting auth")
+    await realmAuth();
+    startMonitoringClipboard();
+    watchUpdates()
+
+})
+
+//Load all previous history on new Window
+ipc.on('load-all-prev', () => {
+    console.log("Loading all prevs")
+    if (!realms[userID].empty) {
+        let list = realms[userID].objects("clipContent")
+        list.forEach((element) => {
+            if (element.type == "text")
+                ipc.send('text-changed', element.value)
+            else
+                ipc.send('image-changed', element.value)
+        })
+    }
+})
+
 
 //Clipboard Monitoring Starts here
 
@@ -47,6 +115,7 @@ async function startMonitoringClipboard() {
             lastText = text
             lastImage = image
             imageChanged(image.toDataURL());
+            console.log("Image Changed")
         }
 
         if (textHasDiff(text, lastText)) {
@@ -62,9 +131,9 @@ async function startMonitoringClipboard() {
 //Clipboard Change Events
 
 async function textChanged(text) {
-    realm.write(async() => {
+    await realms[userID].write(() => {
         // Assign a newly-created instance to the variable.
-        realm.create("clipContent", {
+        realms[userID].create("clipContent", {
             _id: new UUID(),
             type: "text",
             value: text,
@@ -74,14 +143,12 @@ async function textChanged(text) {
 }
 
 async function imageChanged(image) {
-    realm.write(async() => {
+    await realms[userID].write(() => {
         // Assign a newly-created instance to the variable.
-        realm.create("clipContent", {
+        realms[userID].create("clipContent", {
             _id: new UUID(),
             type: "image",
             value: image,
         });
     });
 }
-
-startMonitoringClipboard()

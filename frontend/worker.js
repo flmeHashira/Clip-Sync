@@ -76,14 +76,12 @@ ipc.on('valid-login', () => {
     watchUpdates();
 })
 
+ipc.on('register-user', async(event, crendentials) => {
+    await realmAPI.registerUser(crendentials);
+})
 
 ipc.on('start-auth', async (event, credentials) => {
-    console.log("Recieved credentials on worker window")
-    console.log(credentials);
     await realmAuth(credentials);
-    // startMonitoringClipboard();
-    // watchUpdates()
-
 })
 
 

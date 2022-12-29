@@ -25,27 +25,6 @@ function createWindow() {
             click: () => loginWindowCreate()
         },
         {
-            label: 'Clear History',
-            click: () => {
-                workerWindow.webContents.send('clear-history')
-            }
-
-        },
-        {
-            label: 'Pause',
-            click: () => {
-                workerWindow.webContents.send('pause-history');
-            }
-
-        },
-        {
-            label: 'Resume Sync',
-            click: () => {
-                workerWindow.webContents.send('resume-history');
-            }
-
-        },
-        {
             label: 'Exit application',
             click: () => callclose()
         }
@@ -57,7 +36,7 @@ function createWindow() {
 function helperWindow() {
     // create hidden worker window
     workerWindow = new BrowserWindow({
-        show: true,
+        show: false,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
@@ -80,13 +59,17 @@ function loginWindowCreate()  {
 
         }
     });
+    // loginWindow.webContents.openDevTools();
     loginWindow.loadFile('login.html');
 }
 
 ipcMain.on('login-attempt', (event, message) => {
-    console.log("Recieved login detail on mainframe");
-    console.log(message);
     workerWindow.webContents.send('start-auth', message);
+})
+
+ipcMain.on('new-user', (evt, message) => {
+    workerWindow.webContents.send('register-user', message);
+    loginWindow.reload();
 })
 
 ipcMain.on('login-res', (event, message) => {
@@ -153,7 +136,7 @@ function clip() {
         }
 
     })
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
     mainWindow.loadFile('Main.html')
     mainWindow.once('ready-to-show', () => {
         workerWindow.webContents.send('load-all-prev');

@@ -37,6 +37,11 @@ async function RealmAuths(type, msg) {
 
 }
 
+async function registerUser(credentials)  {
+    const email = credentials.email, password = credentials.password;
+    await realmApp.emailPasswordAuth.registerUser({ email, password });
+}
+
 async function openRealm(user) {
     const config = {
         path: "myrealm",
@@ -66,6 +71,7 @@ async function clearDatabase(realm) {
 }
 
 
+exports.registerUser = registerUser;
 exports.RealmAuths = RealmAuths;
 exports.openRealm = openRealm;
 exports.addSubscription = addSubscription;

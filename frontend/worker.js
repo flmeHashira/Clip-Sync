@@ -11,8 +11,12 @@ const realms = {};
 let userID, syncSession;
 
 //Realm User Auth
-async function realmAuth() {
-    const user = await realmAPI.RealmAuths(1);
+async function realmAuth(credentials) {
+    const user = await realmAPI.RealmAuths(1, credentials);
+    if(user == null)
+        ipc.send('login-res', 'invalid-credentials');
+    else
+        ipc.send('login-res', 'login-complete');
     userID = user.id;
     realms[userID] = await realmAPI.openRealm(user)
     syncSession = realms[userID].syncSession;
@@ -67,17 +71,25 @@ ipc.on('resume-history', () => {
     syncSession.resume()
 })
 
-
-ipc.on('start-auth', async() => {
-    console.log("starting auth")
-    await realmAuth();
+ipc.on('valid-login', () => {
     startMonitoringClipboard();
-    watchUpdates()
+    watchUpdates();
+})
+
+
+ipc.on('start-auth', async (event, credentials) => {
+    console.log("Recieved credentials on worker window")
+    console.log(credentials);
+    await realmAuth(credentials);
+    // startMonitoringClipboard();
+    // watchUpdates()
 
 })
 
+
 //Load all previous history on new Window
 ipc.on('load-all-prev', () => {
+    
     console.log("Loading all prevs")
     if (!realms[userID].empty) {
         let list = realms[userID].objects("clipContent")

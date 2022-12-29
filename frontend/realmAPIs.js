@@ -5,7 +5,7 @@ const configs = require("./config");
 const realmApp = new Realm.App({ id: "clip-sync-ehley" });
 
 
-async function RealmAuths(type) {
+async function RealmAuths(type, msg) {
     if (type == 0) {
         //type 0 is anonymous login
         //type 1 is email/password login
@@ -22,8 +22,8 @@ async function RealmAuths(type) {
     if (type == 1) {
         // Create an email/password credential
         const credentials = Realm.Credentials.emailPassword(
-            process.env.email,
-            process.env.password
+            msg.email,
+            msg.password
         );
         try {
             const user = await realmApp.logIn(credentials);
@@ -31,6 +31,7 @@ async function RealmAuths(type) {
             return user;
         } catch (err) {
             console.error("Failed to log in", err.message);
+            return null;
         }
     }
 

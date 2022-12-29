@@ -4,12 +4,11 @@ const path = require('path')
 const BrowserWindow = electron.BrowserWindow
 const ipcMain = require('electron').ipcMain;
 
-let tray, mainWindow, workerWindow;
+let tray, mainWindow, workerWindow, loginWindow, contextMenu;
 
 async function startApp() {
     createWindow();
     helperWindow();
-    workerWindow.webContents.send('start-auth', "demo")
 }
 
 
@@ -21,9 +20,9 @@ function createWindow() {
         path.join(__dirname, 'icon.jpg')
     );
     tray = new Tray(image.resize({ width: 16, height: 16 }));
-    const contextMenu = Menu.buildFromTemplate([{
-            label: 'Open Cliboard',
-            click: () => clip()
+    contextMenu = Menu.buildFromTemplate([{
+            label: 'log In',
+            click: () => loginWindowCreate()
         },
         {
             label: 'Clear History',
@@ -66,9 +65,73 @@ function helperWindow() {
 
         }
     });
-    workerWindow.webContents.openDevTools();
+    // workerWindow.webContents.openDevTools();
     workerWindow.loadFile('worker.html');
 }
+
+
+function loginWindowCreate()  {
+    loginWindow = new BrowserWindow({
+        show: true,
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false,
+            enableRemoteModule: true
+
+        }
+    });
+    loginWindow.loadFile('login.html');
+}
+
+ipcMain.on('login-attempt', (event, message) => {
+    console.log("Recieved login detail on mainframe");
+    console.log(message);
+    workerWindow.webContents.send('start-auth', message);
+})
+
+ipcMain.on('login-res', (event, message) => {
+    if(message=='invalid-credentials')
+        loginWindow.webContents.send('invalid-login', message);
+    else    {
+        workerWindow.webContents.send('valid-login');
+        loginWindow.close();
+        loginWindow = null;
+        clip();
+        contextMenu = Menu.buildFromTemplate([{
+            label: 'Open Cliboard',
+            click: () => clip()
+
+        },
+        {
+            label: 'Clear History',
+            click: () => {
+                workerWindow.webContents.send('clear-history')
+            }
+
+        },
+        {
+            label: 'Pause',
+            click: () => {
+                workerWindow.webContents.send('pause-history');
+            }
+
+        },
+        {
+            label: 'Resume Sync',
+            click: () => {
+                workerWindow.webContents.send('resume-history');
+            }
+
+        },
+        {
+            label: 'Exit application',
+            click: () => callclose()
+        }])
+        tray.setContextMenu(contextMenu)
+    }
+
+})
+
 
 function clip() {
 
@@ -116,8 +179,8 @@ function clip() {
     })
 }
 
-async function callclose() {
-    await workerWindow.webContents.send('close-realm')
+function callclose() {
+    workerWindow.webContents.send('close-realm')
     mainWindow = null
     app.exit()
 }

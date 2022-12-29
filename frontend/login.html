@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="login.css">
+    <title></title>
+</head>
+<body>
+    <div class = 'wrapper'>
+        <div class = 'loginDiv'>
+            <h1>Login</h1>
+            <form action="#" id="logForm">
+                        <input type="email" name="text" class="input" placeholder="Email">
+                        <input type="password" name="text" class="input" placeholder="Password">
+                    <button id="logInBtn">Log In</button>
+            </form>
+            <p class="small-xl pt-3 text-center">
+                <span class="text-muted">Not a member?</span>
+                <a id="signup" href="#">Sign up</a>
+            </p>
+        </div>
+        <div class="registerDiv">
+            <h1>Welcome!</h1>
+            <form action="#" id="registerForm">
+                        <input type="email" name="text" class="input" placeholder="Email">
+                        <input type="password" name="text" class="input" placeholder="Password">
+                    <button id="signUpBtn">Sign Up</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        const electron = require('electron');
+        const ipc = electron.ipcRenderer;
+
+        document.querySelector('.registerDiv').style.display ="none"; 
+        const signupToggle = document.querySelector('#signup');
+        signupToggle.addEventListener('click', () => {
+            document.querySelector('.loginDiv').style.display ="none"; 
+            document.querySelector('.registerDiv').style.display ="block"; 
+        });
+
+        const logInBtn = document.querySelector('#logInBtn');
+        const signUpBtn = document.querySelector('#signUpBtn');
+        logInBtn.addEventListener('click', () => {
+            const form = document.querySelector('#logForm');
+            ipc.send('login-attempt', {"email": form[0].value, "password": form[1].value});
+            console.log("Sent login details from login page")
+        });
+
+        signUpBtn.addEventListener('click', () => {
+            const form = document.querySelector('#registerForm');
+            console.log(form[0].value);
+            ipc.send('new-user', {"email": form[0].value, "password": form[1].value});
+        })
+
+        ipc.on('invalid-login', ()=> {
+            alert("Invalid Credentias");
+        })
+    </script>
+</body>
+</html>

@@ -27,10 +27,6 @@ const ipc = electron.ipcRenderer
 
 //Insert data to DOM
 
-const img1 = "https://images.unsplash.com/photo-1619024370140-d625f2e354f8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=987&q=80"
-const img2 = "https://images.unsplash.com/photo-1514589553259-ed2658dad420?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3016&q=80"
-const img3 = "https://i.imgur.com/Ji9Ge19.jpg";
-
 const createCardTxt = async(text) => {
     let container = document.querySelector(".container");
     let cardElem = `<div class="card">

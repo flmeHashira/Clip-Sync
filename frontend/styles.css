@@ -14,9 +14,9 @@
 
 body {
     background-color: #eff3ff;
-    background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    height: 100%;
+    background-image: linear-gradient(135deg, #f1f0f0 0%, #c4d1e7 100%);
     perspective: 1px;
+    background-attachment: fixed;
 }
 
 .contents {
@@ -68,11 +68,12 @@ textarea {
     aspect-ratio: 1 / 1;
     border-radius: 1rem;
     background: white;
+    zoom: 1;
     margin: 2.9rem;
     margin-left: 3.2rem;
     margin-right: 3.2rem;
     box-shadow: -10px -10px 15px rgba(255, 255, 255, 0.5), 10px 10px 15px rgba(70, 70, 70, 0.12);
-    transition: all 0.3s ease;
+    transition: all 0.4s ease;
     background-image: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
     scrollbar-width: none;
 }
@@ -89,9 +90,10 @@ textarea {
     max-width: 300px;
     border-radius: 1rem;
     background: white;
+    zoom: 1;
     margin: 1.5rem;
     box-shadow: -10px -10px 15px rgba(255, 255, 255, 0.5), 10px 10px 15px rgba(70, 70, 70, 0.12);
-    transition: 0.3s ease;
+    transition: 0.4s ease;
     background-image: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
 }
 
@@ -102,5 +104,6 @@ textarea {
 
 .card:hover {
     transform: scale(1.1);
+    /* zoom: 1.1; */
     border: 2px solid rgb(71, 71, 71);
 }

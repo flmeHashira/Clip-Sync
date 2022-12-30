@@ -1,17 +1,17 @@
 {
-    "name": "Clip-Sync",
-    "version": "1.0.0",
-    "main": "index.js",
-    "scripts": {
-        "start": "electron ."
-    },
-    "author": "abh",
-    "license": "ISC",
-    "description": "",
-    "dependencies": {
-        "dotenv": "^16.0.3",
-        "electron": "^21.1.1",
-        "realm": "^10.21.1",
-        "socket.io-client": "^4.5.3"
-    }
+  "name": "Clip-Sync",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "abh",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "realm": "^11.3.1"
+  },
+  "devDependencies": {
+    "electron": "^22.0.0"
+  }
 }

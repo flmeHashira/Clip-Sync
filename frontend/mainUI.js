@@ -1,29 +1,3 @@
-const electron = require('electron')
-const { app, Tray, Menu, nativeImage } = electron
-const ipc = electron.ipcRenderer
-
-// socket.on('message', (msg) => {
-//     CreatecardElemTxt(msg)
-// })
-
-//Watch for changes in database
-
-// const Schema = {
-//     name: "clipContent",
-//     properties: {
-//         _id: "uuid",
-//         type: "string",
-//         value: "string",
-//     },
-//     primaryKey: "_id",
-// };
-
-// const realm = new Realm({
-//     path: "myrealm",
-//     schema: [Schema],
-//     deleteRealmIfMigrationNeeded: true,
-// });
-
 
 //Insert data to DOM
 
@@ -38,7 +12,6 @@ const createCardTxt = async(text) => {
     (block.lastElementChild).lastElementChild.innerHTML = text;
     container.appendChild(block);
 }
-
 
 const createCardIMG = async(imgSrc) => {
     let container = document.querySelector(".container")
@@ -59,24 +32,17 @@ const createCardIMG = async(imgSrc) => {
             parent.style.maxWidth = '400px'
         }
     });
-    // add logo to the document
-    // (parent.lastElementChild).style.aspectRatio = `${ratio}`;
-    // console.log(1 / ratio)
     container.appendChild(block);
     (block.lastElementChild).lastElementChild.src = imgSrc
 
 }
 
-// createCardIMG(img1)
-// createCardIMG(img2)
-// createCardIMG(img3)
 
-
-ipc.on('text-changed', (evt, msg) => {
+window.electron.ipc.on('text-changed', (evt, msg) => {
     console.log(msg)
     createCardTxt(msg)
 })
-ipc.on('image-changed', (evt, msg) => {
+window.electron.ipc.on('image-changed', (evt, msg) => {
     createCardIMG(msg)
 })
 

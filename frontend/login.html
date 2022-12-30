@@ -31,9 +31,6 @@
         </div>
     </div>
     <script>
-        const electron = require('electron');
-        const ipc = electron.ipcRenderer;
-
         document.querySelector('.registerDiv').style.display ="none"; 
         const signupToggle = document.querySelector('#signup');
         signupToggle.addEventListener('click', () => {
@@ -45,17 +42,17 @@
         const signUpBtn = document.querySelector('#signUpBtn');
         logInBtn.addEventListener('click', () => {
             const form = document.querySelector('#logForm');
-            ipc.send('login-attempt', {"email": form[0].value, "password": form[1].value});
+            window.electron.ipc.send('login-attempt', {"email": form[0].value, "password": form[1].value});
             console.log("Sent login details from login page")
         });
 
         signUpBtn.addEventListener('click', () => {
             const form = document.querySelector('#registerForm');
             console.log(form[0].value);
-            ipc.send('new-user', {"email": form[0].value, "password": form[1].value});
+            window.electron.ipc.send('new-user', {"email": form[0].value, "password": form[1].value});
         })
 
-        ipc.on('invalid-login', ()=> {
+        window.electron.ipc.on('invalid-login', ()=> {
             alert("Invalid Credentias");
         })
     </script>

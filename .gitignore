@@ -7,3 +7,4 @@ myrealm.note
 .env
 myrealm.management
 mongodb-realm
+dist

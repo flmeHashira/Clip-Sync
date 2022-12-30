@@ -1,8 +1,23 @@
-require('dotenv').config()
 const Realm = require("realm");
 const configs = require("./config");
 
 const realmApp = new Realm.App({ id: "clip-sync-ehley" });
+
+//config
+const Schema = {
+    name: "clipContent",
+    properties: {
+        _id: "uuid",
+        type: "string",
+        value: "string",
+    },
+    primaryKey: "_id",
+};
+
+
+const OpenRealmBehaviorConfiguration = {
+    type: "openImmediately",
+};
 
 
 async function RealmAuths(type, msg) {
@@ -69,7 +84,6 @@ async function clearDatabase(realm) {
         realm.delete(realm.objects("clipContent"));
     });
 }
-
 
 exports.registerUser = registerUser;
 exports.RealmAuths = RealmAuths;

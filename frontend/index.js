@@ -1,8 +1,9 @@
 const electron = require('electron')
 const { app, Tray, Menu, nativeImage } = electron
-const path = require('path')
 const BrowserWindow = electron.BrowserWindow
 const ipcMain = require('electron').ipcMain;
+
+process.chdir(app.getPath('userData'))
 
 let tray, mainWindow, workerWindow, loginWindow, contextMenu;
 
@@ -16,6 +17,7 @@ async function startApp() {
 app.whenReady().then(startApp)
 
 function createWindow() {
+    const path = require('path')
     const image = nativeImage.createFromPath(
         path.join(__dirname, 'icon.jpg')
     );
@@ -40,23 +42,20 @@ function helperWindow() {
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
-            enableRemoteModule: true
 
         }
     });
-    // workerWindow.webContents.openDevTools();
+    workerWindow.webContents.openDevTools();
     workerWindow.loadFile('worker.html');
 }
 
 
 function loginWindowCreate()  {
+    const path = require('path')
     loginWindow = new BrowserWindow({
         show: true,
         webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false,
-            enableRemoteModule: true
-
+            preload: path.join(__dirname, 'preload.js')
         }
     });
     // loginWindow.webContents.openDevTools();
@@ -117,12 +116,10 @@ ipcMain.on('login-res', (event, message) => {
 
 
 function clip() {
-
+    const path = require('path')
     let mainWindow = new BrowserWindow({
         minheight: 500,
         minwidth: 420,
-        // maxHeight: 500,
-        // maxWidth: 420,
         width: 720,
         height: 480,
         autoHideMenuBar: true,
@@ -130,9 +127,7 @@ function clip() {
         maximizable: true,
         closable: true,
         webPreferences: {
-            nodeIntegration: true, // is default value after Electron v5
-            contextIsolation: false, // protect against prototype pollution
-            enableRemoteModule: true, // turn off remote
+            preload: path.join(__dirname, 'preload.js'),
         }
 
     })

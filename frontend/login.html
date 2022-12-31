@@ -11,7 +11,10 @@
     <div class = 'wrapper'>
         <div class = 'loginDiv'>
             <h1>Login</h1>
-            <form action="#" id="logForm">
+            <div class="error-message">
+                <span class="error-text">Incorrect username or password</span>
+            </div>
+            <form action="/" id="logForm">
                         <input type="email" name="text" class="input" placeholder="Email">
                         <input type="password" name="text" class="input" placeholder="Password">
                     <button id="logInBtn">Log In</button>
@@ -29,32 +32,47 @@
                     <button id="signUpBtn">Sign Up</button>
             </form>
         </div>
+        <div class="loader"></div>
     </div>
     <script>
         document.querySelector('.registerDiv').style.display ="none"; 
+        document.querySelector('.loader').style.display ="none";
+        document.querySelector('.error-message').style.display ="none";
+        document.getElementById("logForm").onsubmit=function(e) {
+            e.preventDefault();
+        }
+
         const signupToggle = document.querySelector('#signup');
         signupToggle.addEventListener('click', () => {
             document.querySelector('.loginDiv').style.display ="none"; 
-            document.querySelector('.registerDiv').style.display ="block"; 
+            document.querySelector('.registerDiv').style.display ="flex"; 
         });
 
         const logInBtn = document.querySelector('#logInBtn');
         const signUpBtn = document.querySelector('#signUpBtn');
         logInBtn.addEventListener('click', () => {
             const form = document.querySelector('#logForm');
+            document.querySelector('.loginDiv').style.display ="none";
+            document.querySelector('.loader').style.display ="block";
             window.electron.ipc.send('login-attempt', {"email": form[0].value, "password": form[1].value});
             console.log("Sent login details from login page")
         });
 
         signUpBtn.addEventListener('click', () => {
+            document.querySelector('.registerDiv').style.display ="none";
+            document.querySelector('.loader').style.display ="block";
             const form = document.querySelector('#registerForm');
             console.log(form[0].value);
             window.electron.ipc.send('new-user', {"email": form[0].value, "password": form[1].value});
         })
 
+
         window.electron.ipc.on('invalid-login', ()=> {
-            alert("Invalid Credentias");
+            document.querySelector('.loginDiv').style.display ="flex";
+            document.querySelector('.error-message').style.display ="flex";
+            document.querySelector('.loader').style.display ="none";
         })
+
     </script>
 </body>
 </html>

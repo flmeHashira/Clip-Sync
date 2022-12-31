@@ -1,5 +1,4 @@
 const Realm = require("realm");
-const configs = require("./config");
 
 const realmApp = new Realm.App({ id: "clip-sync-ehley" });
 
@@ -60,13 +59,13 @@ async function registerUser(credentials)  {
 async function openRealm(user) {
     const config = {
         path: "myrealm",
-        schema: [configs.Schema],
+        schema: [Schema],
         deleteRealmIfMigrationNeeded: true,
         sync: {
             user: user,
             flexible: true,
-            newRealmFileBehavior: configs.OpenRealmBehaviorConfiguration,
-            existingRealmFileBehavior: configs.OpenRealmBehaviorConfiguration,
+            newRealmFileBehavior: OpenRealmBehaviorConfiguration,
+            existingRealmFileBehavior: OpenRealmBehaviorConfiguration,
         },
     };
     return Realm.open(config);

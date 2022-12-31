@@ -75,9 +75,9 @@ ipcMain.on('login-res', (event, message) => {
     if(message=='invalid-credentials')
         loginWindow.webContents.send('invalid-login', message);
     else    {
-        workerWindow.webContents.send('valid-login');
         loginWindow.close();
         loginWindow = null;
+        workerWindow.webContents.send('valid-login');
         clip();
         contextMenu = Menu.buildFromTemplate([{
             label: 'Open Cliboard',

@@ -53,6 +53,7 @@ function helperWindow() {
 function loginWindowCreate()  {
     const path = require('path')
     loginWindow = new BrowserWindow({
+        autoHideMenuBar: true,
         show: true,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js')

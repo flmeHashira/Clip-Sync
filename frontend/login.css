@@ -15,6 +15,8 @@ body {
 	font-family: 'Montserrat', sans-serif;
 	height: 100vh;
 	margin: -20px 0 50px;
+	padding: 0;
+	margin: 0;
 }
 
 
@@ -181,4 +183,11 @@ input {
 .error-text {
 	color: #a20028;
 	font-family: 'Roboto', Arial;
+}
+
+::-webkit-scrollbar {
+    width: 0;
+    /* Remove scrollbar space */
+    background: transparent;
+    /* Optional: just make scrollbar invisible */
 }

@@ -46,10 +46,27 @@ window.electron.ipc.on('image-changed', (evt, msg) => {
     createCardIMG(msg)
 })
 
+// window.electron.writeText("HeheBoii");
 
-let cards = document.querySelectorAll('.card');
-cards.forEach(card => {
-    card.addEventListener('click', () => {
-        alert("Copied");
-    })
+//Upon clicking a card
+document.querySelector('.container').addEventListener("click", (e) => {
+    const target = e.target.closest(".card");
+
+    if(target){
+        clickOnCard(e.target);
+    }
 });
+
+function clickOnCard(content)  {
+    console.log(content)
+    let msg;
+    if(content.localName.toLowerCase() == "img")   {
+        msg = {type: "img", value: content.src};
+        window.electron.ipc.send('write-clipboard', msg)
+    }
+    else    {
+        msg = {type: "txt", value: content.innerHTML};
+        window.electron.ipc.send('write-clipboard', msg)
+    }
+}
+

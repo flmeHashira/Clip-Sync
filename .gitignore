@@ -8,4 +8,5 @@ myrealm.note
 myrealm.management
 mongodb-realm
 dist
+.DS_Store
 DS_Store

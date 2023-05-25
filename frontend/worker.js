@@ -5,8 +5,10 @@ const { UUID } = Realm.BSON;
 const ipc = electron.ipcRenderer
 const realmAPI = require('./realmAPIs')
 
-//Realm Implementation
 
+let lastText, lastImage = clipboard.readImage();
+
+//Realm Implementation
 const realms = {};
 let userID, syncSession;
 
@@ -101,6 +103,19 @@ ipc.on('load-all-prev', () => {
 })
 
 
+ipc.on('write-clipboard', (event, message) => {
+    if(message.type == 'img')   {
+        let image = electron.nativeImage.createFromDataURL(message.value)
+        clipboard.writeImage(image);
+        lastImage = image;
+    }
+    else    {
+        clipboard.writeText(message.value);
+        lastText = message.value;
+    }
+})
+
+
 //Clipboard Monitoring Starts here
 
 function imageHasDiff(a, b) {
@@ -114,8 +129,8 @@ function textHasDiff(a, b) {
 let watcherId = null;
 async function startMonitoringClipboard() {
     const watchDelay = 800;
-    let lastText = clipboard.readText()
-    let lastImage = clipboard.readImage()
+    lastText = clipboard.readText()
+    lastImage = clipboard.readImage()
 
     watcherId = setInterval(() => {
         const text = clipboard.readText()
@@ -131,7 +146,6 @@ async function startMonitoringClipboard() {
         if (textHasDiff(text, lastText)) {
             lastText = text
             textChanged(text)
-            console.log("hellooooo")
             console.log("text changed")
         }
     }, watchDelay)

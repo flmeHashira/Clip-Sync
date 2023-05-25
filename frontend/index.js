@@ -45,7 +45,7 @@ function helperWindow() {
 
         }
     });
-    workerWindow.webContents.openDevTools();
+    // workerWindow.webContents.openDevTools();
     workerWindow.loadFile('worker.html');
 }
 
@@ -56,12 +56,17 @@ function loginWindowCreate()  {
         autoHideMenuBar: true,
         show: true,
         webPreferences: {
-            preload: path.join(__dirname, 'preload.js')
+            preload: path.join(__dirname, 'preload.js'),
         }
     });
     // loginWindow.webContents.openDevTools();
     loginWindow.loadFile('login.html');
 }
+
+ipcMain.on('write-clipboard', (evt, message) => {
+    workerWindow.webContents.send('write-clipboard', message);
+})
+
 
 ipcMain.on('login-attempt', (event, message) => {
     workerWindow.webContents.send('start-auth', message);

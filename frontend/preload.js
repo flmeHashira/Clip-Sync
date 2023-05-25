@@ -1,4 +1,5 @@
-const { contextBridge, ipcRenderer, clipboard } = require('electron');
+const { contextBridge, ipcRenderer} = require('electron');
+console.log('From preload!');
 
 contextBridge.exposeInMainWorld('electron', {
     ipc :   {
@@ -10,8 +11,5 @@ contextBridge.exposeInMainWorld('electron', {
           },
         
     },
-    clipboard: {
-        readText: () => clipboard.readText(),
-        readImage: () => clipboard.readImage()
-    }
 });
+

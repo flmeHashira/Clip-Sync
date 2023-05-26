@@ -71,7 +71,6 @@ async function openRealm(user) {
     return Realm.open(config);
 }
 
-
 async function addSubscription(realm, query) {
     await realm.subscriptions.update((mutableSubs) => {
         mutableSubs.add(query);

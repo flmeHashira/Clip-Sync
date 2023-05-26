@@ -12,6 +12,7 @@ let lastText, lastImage = clipboard.readImage();
 const realms = {};
 let userID, syncSession;
 
+
 //Realm User Auth
 async function realmAuth(credentials) {
     const user = await realmAPI.RealmAuths(1, credentials);
@@ -125,6 +126,7 @@ function imageHasDiff(a, b) {
 function textHasDiff(a, b) {
     return a && b !== a
 }
+
 
 let watcherId = null;
 async function startMonitoringClipboard() {

@@ -54,8 +54,16 @@ document.querySelector('.container').addEventListener("click", (e) => {
 
     if(target){
         clickOnCard(e.target);
+        target.style.border = '2.5px ridge #a0b9e5';
+        target.style.boxShadow = '-10px -10px 15px rgba(255, 255, 255, 0.5), 10px 10px 15px #c9d8f2ef';
+        createRipple(e, target);
+        setTimeout(() => {
+            target.style.boxShadow = '-10px -10px 15px rgba(255, 255, 255, 0.5), 10px 10px 15px rgba(70, 70, 70, 0.12)';
+            target.style.border = '2px solid rgb(71, 71, 71)';
+        }, 400);
     }
 });
+
 
 function clickOnCard(content)  {
     console.log(content)
@@ -70,3 +78,23 @@ function clickOnCard(content)  {
     }
 }
 
+function createRipple(event, target) {
+    const button = target;
+  
+    const circle = document.createElement("span");
+    const diameter = Math.max(button.clientWidth, button.clientHeight);
+    const radius = diameter / 2;
+  
+    circle.style.width = circle.style.height = `${diameter}px`;
+    circle.style.left = `${event.clientX - button.offsetLeft - radius}px`;
+    circle.style.top = `${event.clientY - button.offsetTop - radius}px`;
+    circle.classList.add("ripple");
+  
+    const ripple = button.getElementsByClassName("ripple")[0];
+  
+    if (ripple) {
+      ripple.remove();
+    }
+  
+    button.appendChild(circle);
+}

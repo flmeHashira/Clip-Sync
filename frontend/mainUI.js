@@ -39,7 +39,7 @@ const createCardIMG = async(imgSrc) => {
 
 
 window.electron.ipc.on('text-changed', (evt, msg) => {
-    console.log(msg)
+    // console.log(msg)
     createCardTxt(msg)
 })
 window.electron.ipc.on('image-changed', (evt, msg) => {
@@ -66,7 +66,7 @@ document.querySelector('.container').addEventListener("click", (e) => {
 
 
 function clickOnCard(content)  {
-    console.log(content)
+    // console.log(content)
     let msg;
     if(content.localName.toLowerCase() == "img")   {
         msg = {type: "img", value: content.src};
@@ -79,22 +79,17 @@ function clickOnCard(content)  {
 }
 
 function createRipple(event, target) {
-    const button = target;
+    const card = target //event.currentTarget;
   
     const circle = document.createElement("span");
-    const diameter = Math.max(button.clientWidth, button.clientHeight);
+    const diameter = Math.max(card.clientWidth, card.clientHeight);
     const radius = diameter / 2;
-  
+
     circle.style.width = circle.style.height = `${diameter}px`;
-    circle.style.left = `${event.clientX - button.offsetLeft - radius}px`;
-    circle.style.top = `${event.clientY - button.offsetTop - radius}px`;
+    circle.style.left = `${event.x - card.offsetLeft - radius}px`;
+    circle.style.top = `${event.y - card.offsetTop - radius + event.scrollLeft}px`;
     circle.classList.add("ripple");
   
-    const ripple = button.getElementsByClassName("ripple")[0];
-  
-    if (ripple) {
-      ripple.remove();
-    }
-  
-    button.appendChild(circle);
+    const ripple = card.getElementsByClassName("ripple")[0];
+    card.appendChild(circle);
 }

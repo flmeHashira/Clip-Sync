@@ -16,12 +16,13 @@ let userID, syncSession;
 //Realm User Auth
 async function realmAuth(credentials) {
     const user = await realmAPI.RealmAuths(1, credentials);
-    if(user == null)
+    if (user == null) {
         ipc.send('login-res', 'invalid-credentials');
-    else
+    } else
         ipc.send('login-res', 'login-complete');
     userID = user.id;
     realms[userID] = await realmAPI.openRealm(user)
+    console.log(realms[userID])
     syncSession = realms[userID].syncSession;
     await realmAPI.addSubscription(realms[userID], realms[userID].objects("clipContent"))
 }
@@ -40,7 +41,7 @@ function watchUpdates() {
 
 
 function onClipChange(clipContent, changes) {
-    changes.deletions.forEach((index) => {});
+    changes.deletions.forEach((index) => { });
     // Handle newly inserted clipboard content
     changes.insertions.forEach((index) => {
         const insertedData = clipContent[index]
@@ -53,7 +54,7 @@ function onClipChange(clipContent, changes) {
 
     });
     // Handle clipboard objects that were modified
-    changes.modifications.forEach((index) => {});
+    changes.modifications.forEach((index) => { });
     //Order of handling event matters
 }
 
@@ -79,7 +80,7 @@ ipc.on('valid-login', () => {
     watchUpdates();
 })
 
-ipc.on('register-user', async(event, crendentials) => {
+ipc.on('register-user', async (event, crendentials) => {
     await realmAPI.registerUser(crendentials);
 })
 
@@ -90,8 +91,8 @@ ipc.on('start-auth', async (event, credentials) => {
 
 //Load all previous history on new Window
 ipc.on('load-all-prev', () => {
-    
-    console.log("Loading all prevs")
+    console.log(userID)
+    console.log(realms[userID])
     if (!realms[userID].empty) {
         let list = realms[userID].objects("clipContent")
         list.forEach((element) => {
@@ -105,12 +106,12 @@ ipc.on('load-all-prev', () => {
 
 
 ipc.on('write-clipboard', (event, message) => {
-    if(message.type == 'img')   {
+    if (message.type == 'img') {
         let image = electron.nativeImage.createFromDataURL(message.value)
         clipboard.writeImage(image);
         lastImage = image;
     }
-    else    {
+    else {
         clipboard.writeText(message.value);
         lastText = message.value;
     }
@@ -160,6 +161,7 @@ async function textChanged(text) {
     await realms[userID].write(() => {
         // Assign a newly-created instance to the variable.
         realms[userID].create("clipContent", {
+            owner_id: userID,
             _id: new UUID(),
             type: "text",
             value: text,
@@ -172,6 +174,7 @@ async function imageChanged(image) {
     await realms[userID].write(() => {
         // Assign a newly-created instance to the variable.
         realms[userID].create("clipContent", {
+            owner_id: userID,
             _id: new UUID(),
             type: "image",
             value: image,

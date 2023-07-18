@@ -38,14 +38,14 @@ function createWindow() {
 function helperWindow() {
     // create hidden worker window
     workerWindow = new BrowserWindow({
-        show: false,
+        show: true,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
 
         }
     });
-    // workerWindow.webContents.openDevTools();
+    workerWindow.webContents.openDevTools();
     workerWindow.loadFile('worker.html');
 }
 
@@ -59,7 +59,7 @@ function loginWindowCreate()  {
             preload: path.join(__dirname, 'preload.js'),
         }
     });
-    // loginWindow.webContents.openDevTools();
+    loginWindow.webContents.openDevTools();
     loginWindow.loadFile('login.html');
 }
 
@@ -137,7 +137,7 @@ function clip() {
         }
 
     })
-    // mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
     mainWindow.loadFile('Main.html')
     mainWindow.once('ready-to-show', () => {
         workerWindow.webContents.send('load-all-prev');

@@ -6,6 +6,7 @@ const realmApp = new Realm.App({ id: "clip-sync-ehley" });
 const Schema = {
     name: "clipContent",
     properties: {
+        owner_id: "string",
         _id: "uuid",
         type: "string",
         value: "string",
@@ -41,7 +42,7 @@ async function RealmAuths(type, msg) {
         );
         try {
             const user = await realmApp.logIn(credentials);
-            console.log("Successfully logged in!", user.id);
+            console.log("Successfully logged in!", msg.email);
             return user;
         } catch (err) {
             console.error("Failed to log in", err.message);

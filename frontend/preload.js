@@ -1,5 +1,4 @@
 const { contextBridge, ipcRenderer} = require('electron');
-console.log('From preload!');
 
 contextBridge.exposeInMainWorld('electron', {
     ipc :   {

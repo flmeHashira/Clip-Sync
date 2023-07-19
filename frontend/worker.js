@@ -98,7 +98,6 @@ ipc.on('load-all-prev', () => {
     if (!realm.empty) {
         let list = realm.objects("clipContent").filtered("owner_id == $0", userID)
         list.forEach((element) => {
-                console.log(element);
             if (element.type == "text")
                 ipc.send('text-changed', element.value)
             else

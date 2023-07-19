@@ -54,7 +54,6 @@ const menuItems = [
 
 
 
-
 process.chdir(app.getPath('userData'))
 
 let tray, mainWindow, workerWindow, loginWindow, contextMenu, menuSwitch = false
@@ -74,18 +73,8 @@ function createWindow() {
         path.join(__dirname, 'icon.jpg')
     )
     tray = new Tray(image.resize({ width: 16, height: 16 }))
-    // contextMenu = Menu.buildFromTemplate([{
-    //         label: 'log In',
-    //         click: () => loginWindowCreate()
-    //     },
-    //     {
-    //         label: 'Exit application',
-    //         click: () => callclose()
-    //     }
-    // ])
     contextMenu = Menu.buildFromTemplate(menuItems[+menuSwitch])
     menuSwitch= !menuSwitch
-    console.log(menuSwitch)
     tray.setContextMenu(contextMenu)
     tray.setToolTip('open clipboard history')
 }
@@ -93,14 +82,14 @@ function createWindow() {
 function helperWindow() {
     // create hidden worker window
     workerWindow = new BrowserWindow({
-        show: true,
+        show: false,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
 
         }
     })
-    workerWindow.webContents.openDevTools()
+    // workerWindow.webContents.openDevTools()
     workerWindow.loadFile('worker.html')
 }
 
@@ -114,7 +103,7 @@ function loginWindowCreate()  {
             preload: path.join(__dirname, 'preload.js'),
         }
     })
-    loginWindow.webContents.openDevTools()
+    // loginWindow.webContents.openDevTools()
     loginWindow.loadFile('login.html')
 }
 
@@ -141,39 +130,7 @@ ipcMain.on('login-res', (event, message) => {
         loginWindow = null
         workerWindow.webContents.send('valid-login')
         clip()
-        // contextMenu = Menu.buildFromTemplate([{
-        //     label: 'Open Cliboard',
-        //     click: () => clip()
-
-        // },
-        // {
-        //     label: 'Clear History',
-        //     click: () => {
-        //         workerWindow.webContents.send('clear-history')
-        //     }
-
-        // },
-        // {
-        //     label: 'Pause',
-        //     click: () => {
-        //         workerWindow.webContents.send('pause-history')
-        //     }
-
-        // },
-        // {
-        //     label: 'Resume Sync',
-        //     click: () => {
-        //         workerWindow.webContents.send('resume-history')
-        //     }
-
-        // },
-        // {
-        //     label: 'Exit application',
-        //     click: () => callclose()
-        // }])
-        console.log(menuSwitch)
         contextMenu = Menu.buildFromTemplate(menuItems[+menuSwitch])
-        // menuSwitch!= menuSwitch
         tray.setContextMenu(contextMenu)
     }
 
@@ -196,7 +153,7 @@ function clip() {
         }
 
     })
-    mainWindow.webContents.openDevTools()
+    // mainWindow.webContents.openDevTools()
     mainWindow.loadFile('Main.html')
     mainWindow.once('ready-to-show', () => {
         workerWindow.webContents.send('load-all-prev')

@@ -65,7 +65,6 @@ async function openRealm(user) {
     const config = {
         path: "myrealm",
         schema: [Schema],
-        deleteRealmIfMigrationNeeded: true,
         sync: {
             user: user,
             flexible: true,

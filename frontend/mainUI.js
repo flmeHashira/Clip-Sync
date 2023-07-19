@@ -8,7 +8,6 @@ const createCardTxt = async(text) => {
     </div>`;
     let block = document.createElement('div');
     block.innerHTML = cardElem;
-    // console.log(cardElem);
     (block.lastElementChild).lastElementChild.innerHTML = text;
     container.appendChild(block);
 }
@@ -39,11 +38,9 @@ const createCardIMG = async(imgSrc) => {
 
 
 window.electron.ipc.on('text-changed', (evt, msg) => {
-    console.log(msg)
     createCardTxt(msg)
 })
 window.electron.ipc.on('image-changed', (evt, msg) => {
-    console.log("Image changed from mainUI", msg)
     createCardIMG(msg)
 })
 
@@ -71,7 +68,6 @@ document.querySelector('.container').addEventListener("click", (e) => {
 
 
 function clickOnCard(content)  {
-    // console.log(content)
     let msg;
     if(content.localName.toLowerCase() == "img")   {
         msg = {type: "img", value: content.src};

@@ -62,8 +62,12 @@ function onClipChange(clipContent, changes) {
 
 ipc.on('close-realm', async () => {
     // Log out the current user
-    await realm.close();
-    await realmAPI.logOut;
+    await realm.close()
+})
+
+ipc.on('realm-logOut', async() => {
+    await realm.close()
+    await realmAPI.logOut
 })
 
 ipc.on('clear-history', () => {

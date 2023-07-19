@@ -43,7 +43,7 @@ const menuItems = [
         },
         {
             label: 'Log out',
-            click: () => callclose()
+            click: () => userLogOut()
         },
         {
             label: 'Exit application',
@@ -89,7 +89,7 @@ function helperWindow() {
 
         }
     })
-    // workerWindow.webContents.openDevTools()
+    workerWindow.webContents.openDevTools()
     workerWindow.loadFile('worker.html')
 }
 
@@ -131,6 +131,7 @@ ipcMain.on('login-res', (event, message) => {
         workerWindow.webContents.send('valid-login')
         clip()
         contextMenu = Menu.buildFromTemplate(menuItems[+menuSwitch])
+        menuSwitch = !menuSwitch
         tray.setContextMenu(contextMenu)
     }
 
@@ -139,7 +140,7 @@ ipcMain.on('login-res', (event, message) => {
 
 function clip() {
     const path = require('path')
-    let mainWindow = new BrowserWindow({
+        mainWindow = new BrowserWindow({
         minheight: 500,
         minwidth: 420,
         width: 720,
@@ -183,4 +184,13 @@ async function callclose() {
     await workerWindow.webContents.send('close-realm')
     mainWindow = null
     app.exit()
+}
+
+async function userLogOut() {
+    mainWindow.close();
+    mainWindow = null
+    contextMenu = Menu.buildFromTemplate(menuItems[+menuSwitch])
+    menuSwitch = !menuSwitch
+    tray.setContextMenu(contextMenu)
+    workerWindow.webContents.send('realm-logOut')
 }

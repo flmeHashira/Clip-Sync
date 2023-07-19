@@ -19,6 +19,10 @@ const OpenRealmBehaviorConfiguration = {
     type: "openImmediately",
 };
 
+async function logOut()    {
+    await realmApp.currentUser?.logOut();
+}
+
 
 async function RealmAuths(type, msg) {
     if (type == 0) {
@@ -89,3 +93,4 @@ exports.RealmAuths = RealmAuths;
 exports.openRealm = openRealm;
 exports.addSubscription = addSubscription;
 exports.clearDatabase = clearDatabase;
+exports.logOut = logOut;

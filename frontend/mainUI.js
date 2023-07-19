@@ -39,12 +39,17 @@ const createCardIMG = async(imgSrc) => {
 
 
 window.electron.ipc.on('text-changed', (evt, msg) => {
-    // console.log(msg)
+    console.log(msg)
     createCardTxt(msg)
 })
 window.electron.ipc.on('image-changed', (evt, msg) => {
+    console.log("Image changed from mainUI", msg)
     createCardIMG(msg)
 })
+
+// window.electron.ipc.on('clear-history', () => {
+//     let container = document.querySelector(".container").innerHTML = "";
+// })
 
 // window.electron.writeText("HeheBoii");
 

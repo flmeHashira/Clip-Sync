@@ -9,7 +9,7 @@ const realmAPI = require('./realmAPIs')
 let lastText, lastImage = clipboard.readImage();
 
 //Realm Implementation
-const realms = {};
+let realm;
 let userID, syncSession;
 
 
@@ -18,18 +18,18 @@ async function realmAuth(credentials) {
     const user = await realmAPI.RealmAuths(1, credentials);
     if (user == null) {
         ipc.send('login-res', 'invalid-credentials');
-    } else
+    }
         ipc.send('login-res', 'login-complete');
     userID = user.id;
-    realms[userID] = await realmAPI.openRealm(user)
-    console.log(realms[userID])
-    syncSession = realms[userID].syncSession;
-    await realmAPI.addSubscription(realms[userID], realms[userID].objects("clipContent"))
+    const realm_= await realmAPI.openRealm(user)
+    realm = realm_;
+    syncSession = realm.syncSession;
+    await realmAPI.addSubscription(realm, realm.objects("clipContent"))
 }
 
 //Watch for Updates in Database
 function watchUpdates() {
-    const clipContent = realms[userID].objects("clipContent")
+    const clipContent = realm.objects("clipContent")
     try {
         clipContent.addListener(onClipChange);
     } catch (error) {
@@ -60,12 +60,14 @@ function onClipChange(clipContent, changes) {
 
 
 
-ipc.on('close-realm', () => {
-    realms[userID].close()
+ipc.on('close-realm', async () => {
+    // Log out the current user
+    await realm.close();
+    await realmAPI.logOut;
 })
 
 ipc.on('clear-history', () => {
-    realmAPI.clearDatabase(realms[userID]);
+    realmAPI.clearDatabase(realm);
 })
 
 ipc.on('pause-history', () => {
@@ -92,10 +94,11 @@ ipc.on('start-auth', async (event, credentials) => {
 //Load all previous history on new Window
 ipc.on('load-all-prev', () => {
     console.log(userID)
-    console.log(realms[userID])
-    if (!realms[userID].empty) {
-        let list = realms[userID].objects("clipContent")
+    console.log(realm)
+    if (!realm.empty) {
+        let list = realm.objects("clipContent").filtered("owner_id == $0", userID)
         list.forEach((element) => {
+                console.log(element);
             if (element.type == "text")
                 ipc.send('text-changed', element.value)
             else
@@ -111,7 +114,7 @@ ipc.on('write-clipboard', (event, message) => {
         clipboard.writeImage(image);
         lastImage = image;
     }
-    else {
+ {
         clipboard.writeText(message.value);
         lastText = message.value;
     }
@@ -143,7 +146,7 @@ async function startMonitoringClipboard() {
             lastText = text
             lastImage = image
             imageChanged(image.toDataURL());
-            console.log("Image Changed")
+            console.log("Image Changed from worker", lastImage)
         }
 
         if (textHasDiff(text, lastText)) {
@@ -158,9 +161,9 @@ async function startMonitoringClipboard() {
 //Clipboard Change Events
 
 async function textChanged(text) {
-    await realms[userID].write(() => {
+    await realm.write(() => {
         // Assign a newly-created instance to the variable.
-        realms[userID].create("clipContent", {
+        realm.create("clipContent", {
             owner_id: userID,
             _id: new UUID(),
             type: "text",
@@ -171,9 +174,9 @@ async function textChanged(text) {
 }
 
 async function imageChanged(image) {
-    await realms[userID].write(() => {
+    await realm.write(() => {
         // Assign a newly-created instance to the variable.
-        realms[userID].create("clipContent", {
+        realm.create("clipContent", {
             owner_id: userID,
             _id: new UUID(),
             type: "image",

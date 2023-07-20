@@ -82,7 +82,7 @@ function createWindow() {
 function helperWindow() {
     // create hidden worker window
     workerWindow = new BrowserWindow({
-        show: false,
+        show: true,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
@@ -103,7 +103,7 @@ function loginWindowCreate()  {
             preload: path.join(__dirname, 'preload.js'),
         }
     })
-    // loginWindow.webContents.openDevTools()
+    loginWindow.webContents.openDevTools()
     loginWindow.loadFile('login.html')
 }
 
@@ -121,15 +121,20 @@ ipcMain.on('new-user', (evt, message) => {
     loginWindow.reload()
 })
 
+ipcMain.on('loading-complete', () => {
+    mainWindow.webContents.send('loading-complete')
+})
 
-ipcMain.on('login-res', (event, message) => {
+
+ipcMain.on('login-res', async(event, message) => {
     if(message=='invalid-credentials')
         loginWindow.webContents.send('invalid-login', message)
     else    {
         loginWindow.close()
         loginWindow = null
-        workerWindow.webContents.send('valid-login')
+        await workerWindow.webContents.send('valid-login')
         clip()
+        // workerWindow.webContents.send('load-all-prev')
         contextMenu = Menu.buildFromTemplate(menuItems[+menuSwitch])
         menuSwitch = !menuSwitch
         tray.setContextMenu(contextMenu)
@@ -154,17 +159,13 @@ function clip() {
         }
 
     })
-    // mainWindow.webContents.openDevTools()
+    mainWindow.webContents.openDevTools()
     mainWindow.loadFile('Main.html')
-    mainWindow.once('ready-to-show', () => {
-        workerWindow.webContents.send('load-all-prev')
-    })
+    workerWindow.webContents.send('load-all-prev')
     mainWindow.on('close', (event) => {
-        if (!app.isQuiting) {
-            event.preventDefault()
-            mainWindow.hide()
-        }
-
+        event.preventDefault()
+        mainWindow.close()
+        mainWindow = null
     })
 
     mainWindow.on('minimize', (event) => {

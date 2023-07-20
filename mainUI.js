@@ -44,6 +44,11 @@ window.electron.ipc.on('image-changed', (evt, msg) => {
     createCardIMG(msg)
 })
 
+window.electron.ipc.on('loading-complete', () => {
+    console.log("Recieved loading complete")
+    document.querySelector('.loader').style.display ="none";
+})
+
 // window.electron.ipc.on('clear-history', () => {
 //     let container = document.querySelector(".container").innerHTML = "";
 // })

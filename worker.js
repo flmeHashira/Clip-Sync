@@ -10,7 +10,7 @@ let lastText, lastImage = clipboard.readImage();
 
 //Realm Implementation
 let realm;
-let userID, syncSession;
+let userID, syncSession
 
 
 //Realm User Auth
@@ -18,14 +18,28 @@ async function realmAuth(credentials) {
     const user = await realmAPI.RealmAuths(1, credentials);
     if (user == null) {
         ipc.send('login-res', 'invalid-credentials');
+        return;
     }
-        ipc.send('login-res', 'login-complete');
+    ipc.send('login-res', 'login-complete');
     userID = user.id;
     const realm_= await realmAPI.openRealm(user)
     realm = realm_;
     syncSession = realm.syncSession;
-    await realmAPI.addSubscription(realm, realm.objects("clipContent"))
+    // realm.syncSession?.addProgressNotification(
+    //     "download",
+    //     "forCurrentlyOutstandingWork",
+    //     handleNotifications
+    //   );
+    await realmAPI.addSubscription(realm, realm.objects("clipContent").filtered("owner_id == $0", userID))
 }
+
+
+// const handleNotifications = (transferred, transferable) => {
+//     console.log(transferred, transferable)
+//     if (transferred === transferable) {
+//         ipc.send('loading-complete')
+//     }
+//   };
 
 //Watch for Updates in Database
 function watchUpdates() {
@@ -96,18 +110,20 @@ ipc.on('start-auth', async (event, credentials) => {
 
 
 //Load all previous history on new Window
-ipc.on('load-all-prev', () => {
-    console.log(userID)
-    console.log(realm)
-    if (!realm.empty) {
-        let list = realm.objects("clipContent").filtered("owner_id == $0", userID)
-        list.forEach((element) => {
-            if (element.type == "text")
-                ipc.send('text-changed', element.value)
-            else
-                ipc.send('image-changed', element.value)
-        })
-    }
+ipc.on('load-all-prev', async () => {
+    // console.log(userID)
+    // console.log(realm)
+    // let list =  await realm.objects("clipContent").filtered("owner_id == $0", userID)
+    let count = 0;
+    realm.objects("clipContent").forEach((element) => {
+        console.log(element);
+        ++count;
+        if (element.type == "text")
+            ipc.send('text-changed', element.value)
+        else
+            ipc.send('image-changed', element.value)
+    })
+    console.log(count)
 })
 
 

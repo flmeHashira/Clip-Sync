@@ -1,35 +1,35 @@
 const electron = require('electron')
 const clipboard = electron.clipboard
 const Realm = require("realm")
-const { UUID } = Realm.BSON;
+const { UUID } = Realm.BSON
 const ipc = electron.ipcRenderer
 const realmAPI = require('./realmAPIs')
 
 
-let lastText, lastImage = clipboard.readImage();
+let lastText, lastImage = clipboard.readImage()
 
 //Realm Implementation
-let realm;
+let realm
 let userID, syncSession
 
 
 //Realm User Auth
 async function realmAuth(credentials) {
-    const user = await realmAPI.RealmAuths(1, credentials);
+    const user = await realmAPI.RealmAuths(1, credentials)
     if (user == null) {
-        ipc.send('login-res', 'invalid-credentials');
-        return;
+        ipc.send('login-res', 'invalid-credentials')
+        return
     }
-    ipc.send('login-res', 'login-complete');
-    userID = user.id;
+    ipc.send('login-res', 'login-complete')
+    userID = user.id
     const realm_= await realmAPI.openRealm(user)
-    realm = realm_;
-    syncSession = realm.syncSession;
+    realm = realm_
+    syncSession = realm.syncSession
     // realm.syncSession?.addProgressNotification(
     //     "download",
     //     "forCurrentlyOutstandingWork",
     //     handleNotifications
-    //   );
+    //   )
     await realmAPI.addSubscription(realm, realm.objects("clipContent").filtered("owner_id == $0", userID))
 }
 
@@ -39,36 +39,36 @@ async function realmAuth(credentials) {
 //     if (transferred === transferable) {
 //         ipc.send('loading-complete')
 //     }
-//   };
+//   }
 
 //Watch for Updates in Database
 function watchUpdates() {
     const clipContent = realm.objects("clipContent")
     try {
-        clipContent.addListener(onClipChange);
+        clipContent.addListener(onClipChange)
     } catch (error) {
         console.error(
             `An exception was thrown within the change listener: ${error}`
-        );
+        )
     }
 }
 
 
 function onClipChange(clipContent, changes) {
-    changes.deletions.forEach((index) => { });
+    changes.deletions.forEach((index) => { })
     // Handle newly inserted clipboard content
     changes.insertions.forEach((index) => {
         const insertedData = clipContent[index]
-        let msg = insertedData.value;
-        let type = insertedData.type;
+        let msg = insertedData.value
+        let type = insertedData.type
         if (type == "text")
             ipc.send('text-changed', msg)
         else
             ipc.send('image-changed', msg)
 
-    });
+    })
     // Handle clipboard objects that were modified
-    changes.modifications.forEach((index) => { });
+    changes.modifications.forEach((index) => { })
     //Order of handling event matters
 }
 
@@ -85,7 +85,7 @@ ipc.on('realm-logOut', async() => {
 })
 
 ipc.on('clear-history', () => {
-    realmAPI.clearDatabase(realm);
+    realmAPI.clearDatabase(realm)
 })
 
 ipc.on('pause-history', () => {
@@ -96,16 +96,16 @@ ipc.on('resume-history', () => {
 })
 
 ipc.on('valid-login', () => {
-    startMonitoringClipboard();
-    watchUpdates();
+    startMonitoringClipboard()
+    watchUpdates()
 })
 
 ipc.on('register-user', async (event, crendentials) => {
-    await realmAPI.registerUser(crendentials);
+    await realmAPI.registerUser(crendentials)
 })
 
 ipc.on('start-auth', async (event, credentials) => {
-    await realmAuth(credentials);
+    await realmAuth(credentials)
 })
 
 
@@ -114,28 +114,24 @@ ipc.on('load-all-prev', async () => {
     // console.log(userID)
     // console.log(realm)
     // let list =  await realm.objects("clipContent").filtered("owner_id == $0", userID)
-    let count = 0;
     realm.objects("clipContent").forEach((element) => {
-        console.log(element);
-        ++count;
         if (element.type == "text")
             ipc.send('text-changed', element.value)
         else
             ipc.send('image-changed', element.value)
     })
-    console.log(count)
 })
 
 
 ipc.on('write-clipboard', (event, message) => {
     if (message.type == 'img') {
         let image = electron.nativeImage.createFromDataURL(message.value)
-        clipboard.writeImage(image);
-        lastImage = image;
+        clipboard.writeImage(image)
+        lastImage = image
     }
- {
-        clipboard.writeText(message.value);
-        lastText = message.value;
+    else {
+        clipboard.writeText(message.value)
+        lastText = message.value
     }
 })
 
@@ -151,9 +147,9 @@ function textHasDiff(a, b) {
 }
 
 
-let watcherId = null;
+let watcherId = null
 async function startMonitoringClipboard() {
-    const watchDelay = 800;
+    const watchDelay = 800
     lastText = clipboard.readText()
     lastImage = clipboard.readImage()
 
@@ -164,7 +160,7 @@ async function startMonitoringClipboard() {
         if (imageHasDiff(image, lastImage)) {
             lastText = text
             lastImage = image
-            imageChanged(image.toDataURL());
+            imageChanged(image.toDataURL())
             console.log("Image Changed from worker", lastImage)
         }
 
@@ -187,8 +183,8 @@ async function textChanged(text) {
             _id: new UUID(),
             type: "text",
             value: text,
-        });
-    });
+        })
+    })
 
 }
 
@@ -200,6 +196,6 @@ async function imageChanged(image) {
             _id: new UUID(),
             type: "image",
             value: image,
-        });
-    });
+        })
+    })
 }

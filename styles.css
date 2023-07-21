@@ -134,7 +134,7 @@ span.ripple {
   }
   
   
-  .loader:after {
+.loader:after {
 	content: '';
 	width: 100%;
 	height: 100%;
@@ -146,9 +146,9 @@ span.ripple {
 	border-radius: 7px;
 	animation: jump7456 0.5s linear infinite;
     
-  }
+}
   
-  @keyframes jump7456 {
+@keyframes jump7456 {
 	15% {
 	  border-bottom-right-radius: 3px;
 	}
@@ -169,4 +169,4 @@ span.ripple {
 	100% {
 	  transform: translateY(0) rotate(90deg);
 	}
-  }
+}

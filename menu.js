@@ -25,14 +25,14 @@ const menu = [
         {
             label: 'Pause',
             click: () => {
-                workerWindow.webContents.send('pause-history');
+                workerWindow.webContents.send('pause-history')
             }
 
         },
         {
             label: 'Resume Sync',
             click: () => {
-                workerWindow.webContents.send('resume-history');
+                workerWindow.webContents.send('resume-history')
             }
 
         },
@@ -47,4 +47,4 @@ const menu = [
     ]
 ]
 
-module.exports = menu;
+module.exports = menu

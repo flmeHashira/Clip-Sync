@@ -30,14 +30,14 @@ const menuItems = [
         {
             label: 'Pause',
             click: () => {
-                workerWindow.webContents.send('pause-history');
+                workerWindow.webContents.send('pause-history')
             }
 
         },
         {
             label: 'Resume Sync',
             click: () => {
-                workerWindow.webContents.send('resume-history');
+                workerWindow.webContents.send('resume-history')
             }
 
         },
@@ -82,14 +82,14 @@ function createWindow() {
 function helperWindow() {
     // create hidden worker window
     workerWindow = new BrowserWindow({
-        show: true,
+        show: false,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
 
         }
     })
-    workerWindow.webContents.openDevTools()
+    // workerWindow.webContents.openDevTools()
     workerWindow.loadFile('worker.html')
 }
 
@@ -103,7 +103,7 @@ function loginWindowCreate()  {
             preload: path.join(__dirname, 'preload.js'),
         }
     })
-    loginWindow.webContents.openDevTools()
+    // loginWindow.webContents.openDevTools()
     loginWindow.loadFile('login.html')
 }
 
@@ -121,8 +121,12 @@ ipcMain.on('new-user', (evt, message) => {
     loginWindow.reload()
 })
 
-ipcMain.on('loading-complete', () => {
-    mainWindow.webContents.send('loading-complete')
+ipcMain.on('text-changed', (event, text) => {
+    mainWindow.webContents.send('text-changed', text)
+})
+
+ipcMain.on('image-changed', (event, image) => {
+    mainWindow.webContents.send('image-changed', image)
 })
 
 
@@ -134,7 +138,6 @@ ipcMain.on('login-res', async(event, message) => {
         loginWindow = null
         await workerWindow.webContents.send('valid-login')
         clip()
-        // workerWindow.webContents.send('load-all-prev')
         contextMenu = Menu.buildFromTemplate(menuItems[+menuSwitch])
         menuSwitch = !menuSwitch
         tray.setContextMenu(contextMenu)
@@ -159,25 +162,13 @@ function clip() {
         }
 
     })
-    mainWindow.webContents.openDevTools()
+    // mainWindow.webContents.openDevTools()
     mainWindow.loadFile('Main.html')
     workerWindow.webContents.send('load-all-prev')
-    mainWindow.on('close', (event) => {
-        event.preventDefault()
-        mainWindow.close()
-        mainWindow = null
-    })
 
     mainWindow.on('minimize', (event) => {
         event.preventDefault()
         mainWindow.hide()
-    })
-    ipcMain.on('text-changed', (event, text) => {
-        mainWindow.webContents.send('text-changed', text)
-    })
-
-    ipcMain.on('image-changed', (event, image) => {
-        mainWindow.webContents.send('image-changed', image)
     })
 }
 
@@ -187,8 +178,8 @@ async function callclose() {
     app.exit()
 }
 
-async function userLogOut() {
-    mainWindow.close();
+function userLogOut() {
+    mainWindow.close()
     mainWindow = null
     contextMenu = Menu.buildFromTemplate(menuItems[+menuSwitch])
     menuSwitch = !menuSwitch

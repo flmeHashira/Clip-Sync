@@ -111,6 +111,11 @@ ipcMain.on('write-clipboard', (evt, message) => {
     workerWindow.webContents.send('write-clipboard', message)
 })
 
+ipcMain.on('delete-clipboard', (evt, message) => {
+    workerWindow.webContents.send('delete-clipboard', message)
+})
+
+
 
 ipcMain.on('login-attempt', (event, message) => {
     workerWindow.webContents.send('start-auth', message)

@@ -25,21 +25,8 @@ async function realmAuth(credentials) {
     const realm_= await realmAPI.openRealm(user)
     realm = realm_
     syncSession = realm.syncSession
-    // realm.syncSession?.addProgressNotification(
-    //     "download",
-    //     "forCurrentlyOutstandingWork",
-    //     handleNotifications
-    //   )
     await realmAPI.addSubscription(realm, realm.objects("clipContent").filtered("owner_id == $0", userID))
 }
-
-
-// const handleNotifications = (transferred, transferable) => {
-//     console.log(transferred, transferable)
-//     if (transferred === transferable) {
-//         ipc.send('loading-complete')
-//     }
-//   }
 
 //Watch for Updates in Database
 function watchUpdates() {
@@ -133,6 +120,15 @@ ipc.on('write-clipboard', (event, message) => {
         clipboard.writeText(message.value)
         lastText = message.value
     }
+})
+
+ipc.on('delete-clipboard', (event, message) => {
+    // console.log(message)
+    const card = realm.objects("clipContent").filtered("value == $0", message.value)
+    card.forEach(card_ => console.log("results:", card_))
+    realm.write(() => {
+        realm.delete(card)
+    })
 })
 
 

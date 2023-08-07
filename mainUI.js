@@ -9,9 +9,7 @@ const loader = setInterval(() => {
 }, 500)
 
 const createCardTxt = async(msg) => {
-    console.log(msg.value)
     let text = msg.value, id = msg.id
-    console.log(id)
     let container = document.querySelector(".container")
     let card_outer = document.createElement('div')
     card_outer.className = 'card-outer'
@@ -26,8 +24,7 @@ const createCardTxt = async(msg) => {
     block.className = 'card'
     block.innerHTML = `<textarea readonly>${text}</textarea>`
     card_outer.appendChild(block)
-    container.appendChild(card_outer)
-    // console.log("No of child elements(from txt): ", document.querySelector(".container").childElementCount)
+    container.appendChild(card_outer)    
 }
 
 const createCardIMG = async(msg) => {
@@ -48,7 +45,6 @@ const createCardIMG = async(msg) => {
     let ratio
     myImg.addEventListener('load', (event) => {
         ratio = myImg.naturalWidth / myImg.naturalHeight
-        console.log(ratio)
         if (ratio < 0.75) {
             myImg.style.maxWidth = '200px'
 
@@ -94,18 +90,12 @@ document.querySelector('.container').addEventListener("click", (e) => {
         }, 400)
     }
     else if(del_btn)    {
-        console.log(del_btn)
         deleteCard(del_btn)
         document.querySelector(".container").removeChild(del_btn)
     }
 })
 
 function deleteCard(card_elem)  {
-    console.log(card_elem)
-    // if(content.localName.toLowerCase() == "img")
-    //     msg = {type: "img", value: content.src}
-    // else
-    //     msg = {type: "txt", value: content.innerHTML}
     window.electron.ipc.send('delete-clipboard', card_elem.id)
 }
 

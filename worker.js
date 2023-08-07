@@ -101,15 +101,12 @@ ipc.on('start-auth', async (event, credentials) => {
 
 //Load all previous history on new Window
 ipc.on('load-all-prev', async () => {
-    // console.log(userID)
-    // console.log(realm)
     let list =  await realm.objects("clipContent").filtered("owner_id == $0", userID)
     list.forEach((element) => {
         let msg = {
             value: element.value, 
             id: element._id.toString()
         }
-        // console.log(msg)
         if (element.type == "text")
             ipc.send('text-changed', msg)
         else
@@ -131,7 +128,6 @@ ipc.on('write-clipboard', (event, message) => {
 })
 
 ipc.on('delete-clipboard', async (event, message) => {
-    console.log(message)
     let uuid = new UUID(message)
     const card = await realm.objects("clipContent").filtered("_id == $0", uuid)
     realm.write(async() => {
@@ -165,13 +161,11 @@ async function startMonitoringClipboard() {
             // lastText = text
             lastImage = image
             imageChanged(image.toDataURL())
-            console.log("Image Changed from worker", lastImage)
         }
 
         if (textHasDiff(text, lastText)) {
             lastText = text
             textChanged(text)
-            console.log("text changed")
         }
     }, watchDelay)
 }

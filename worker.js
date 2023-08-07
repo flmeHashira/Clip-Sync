@@ -46,7 +46,10 @@ function onClipChange(clipContent, changes) {
     // Handle newly inserted clipboard content
     changes.insertions.forEach((index) => {
         const insertedData = clipContent[index]
-        let msg = insertedData.value
+        let msg = {
+            value: insertedData.value,
+            id: insertedData._id.toString()
+        }
         let type = insertedData.type
         if (type == "text")
             ipc.send('text-changed', msg)
@@ -100,12 +103,17 @@ ipc.on('start-auth', async (event, credentials) => {
 ipc.on('load-all-prev', async () => {
     // console.log(userID)
     // console.log(realm)
-    // let list =  await realm.objects("clipContent").filtered("owner_id == $0", userID)
-    realm.objects("clipContent").forEach((element) => {
+    let list =  await realm.objects("clipContent").filtered("owner_id == $0", userID)
+    list.forEach((element) => {
+        let msg = {
+            value: element.value, 
+            id: element._id.toString()
+        }
+        // console.log(msg)
         if (element.type == "text")
-            ipc.send('text-changed', element.value)
+            ipc.send('text-changed', msg)
         else
-            ipc.send('image-changed', element.value)
+            ipc.send('image-changed', msg)
     })
 })
 
@@ -122,12 +130,12 @@ ipc.on('write-clipboard', (event, message) => {
     }
 })
 
-ipc.on('delete-clipboard', (event, message) => {
-    // console.log(message)
-    const card = realm.objects("clipContent").filtered("value == $0", message.value)
-    card.forEach(card_ => console.log("results:", card_))
-    realm.write(() => {
-        realm.delete(card)
+ipc.on('delete-clipboard', async (event, message) => {
+    console.log(message)
+    let uuid = new UUID(message)
+    const card = await realm.objects("clipContent").filtered("_id == $0", uuid)
+    realm.write(async() => {
+        await realm.delete(card)
     })
 })
 
@@ -154,7 +162,7 @@ async function startMonitoringClipboard() {
         const image = clipboard.readImage()
 
         if (imageHasDiff(image, lastImage)) {
-            lastText = text
+            // lastText = text
             lastImage = image
             imageChanged(image.toDataURL())
             console.log("Image Changed from worker", lastImage)

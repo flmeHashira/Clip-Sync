@@ -8,10 +8,14 @@ const loader = setInterval(() => {
     }
 }, 500)
 
-const createCardTxt = async(text) => {
+const createCardTxt = async(msg) => {
+    console.log(msg.value)
+    let text = msg.value, id = msg.id
+    console.log(id)
     let container = document.querySelector(".container")
     let card_outer = document.createElement('div')
     card_outer.className = 'card-outer'
+    card_outer.setAttribute("id",id);
 
     let del_btn = document.createElement('div')
     del_btn.className = 'delete-btn'
@@ -23,10 +27,11 @@ const createCardTxt = async(text) => {
     block.innerHTML = `<textarea readonly>${text}</textarea>`
     card_outer.appendChild(block)
     container.appendChild(card_outer)
-    console.log("No of child elements(from txt): ", document.querySelector(".container").childElementCount)
+    // console.log("No of child elements(from txt): ", document.querySelector(".container").childElementCount)
 }
 
-const createCardIMG = async(imgSrc) => {
+const createCardIMG = async(msg) => {
+    let imgSrc = msg.value, id = msg.id 
     let container = document.querySelector(".container")
     let card_outer = document.createElement('div')
     card_outer.className = 'card-outer'
@@ -56,9 +61,6 @@ const createCardIMG = async(imgSrc) => {
     block.appendChild(myImg)
     card_outer.appendChild(block)
     container.appendChild(card_outer)
-
-    console.log("No of child elements(from img): ", document.querySelector(".container").childElementCount)
-
 }
 
 
@@ -81,7 +83,6 @@ document.querySelector('.container').addEventListener("click", (e) => {
     const card = e.target.closest(".card")
     const del_btn = e.target.closest(".card-outer")
 
-
     if(card){
         clickOnCard(e.target)
         card.style.border = '2.5px ridge #a0b9e5'
@@ -93,21 +94,19 @@ document.querySelector('.container').addEventListener("click", (e) => {
         }, 400)
     }
     else if(del_btn)    {
-        deleteCard(del_btn.lastChild)
+        console.log(del_btn)
+        deleteCard(del_btn)
         document.querySelector(".container").removeChild(del_btn)
     }
 })
 
 function deleteCard(card_elem)  {
     console.log(card_elem)
-    let content = card_elem.lastChild, msg
-    console.log(content)
-    if(content.localName.toLowerCase() == "img")
-        msg = {type: "img", value: content.src}
-    else
-        msg = {type: "txt", value: content.innerHTML}
-    console.log(msg)
-    window.electron.ipc.send('delete-clipboard', msg)
+    // if(content.localName.toLowerCase() == "img")
+    //     msg = {type: "img", value: content.src}
+    // else
+    //     msg = {type: "txt", value: content.innerHTML}
+    window.electron.ipc.send('delete-clipboard', card_elem.id)
 }
 
 

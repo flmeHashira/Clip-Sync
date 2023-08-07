@@ -82,14 +82,14 @@ function createWindow() {
 function helperWindow() {
     // create hidden worker window
     workerWindow = new BrowserWindow({
-        show: false,
+        show: true,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
 
         }
     })
-    // workerWindow.webContents.openDevTools()
+    workerWindow.webContents.openDevTools()
     workerWindow.loadFile('worker.html')
 }
 
@@ -126,12 +126,12 @@ ipcMain.on('new-user', (evt, message) => {
     loginWindow.reload()
 })
 
-ipcMain.on('text-changed', (event, text) => {
-    mainWindow.webContents.send('text-changed', text)
+ipcMain.on('text-changed', (event, msg) => {
+    mainWindow.webContents.send('text-changed', msg)
 })
 
-ipcMain.on('image-changed', (event, image) => {
-    mainWindow.webContents.send('image-changed', image)
+ipcMain.on('image-changed', (event, msg) => {
+    mainWindow.webContents.send('image-changed', msg)
 })
 
 
@@ -167,7 +167,7 @@ function clip() {
         }
 
     })
-    // mainWindow.webContents.openDevTools()
+    mainWindow.webContents.openDevTools()
     mainWindow.loadFile('Main.html')
     workerWindow.webContents.send('load-all-prev')
 

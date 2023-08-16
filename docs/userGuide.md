@@ -5,13 +5,10 @@
 2. Create a new App from App Services UI [](https://www.mongodb.com/docs/atlas/app-services/apps/create/#create-an-app)
 
 ### Setup App and device sync:
-Insert your app id obtained [here](https://www.mongodb.com/docs/atlas/app-services/apps/metadata/#std-label-find-your-app-id) in place of `<yourAppId>`  in RealmAPIs.
+Insert your app id obtained [here](https://www.mongodb.com/docs/atlas/app-services/apps/metadata/#std-label-find-your-app-id) in [RealmAPIs.js](realmAPIs.js).
 
-[https://github.com/flmeHashira/Clip-Sync/blob/0b7230426b1c747eebd9427027273d8ea6f52a83/realmAPIs.js](https://github.com/flmeHashira/Clip-Sync/blob/0b7230426b1c747eebd9427027273d8ea6f52a83/realmAPIs.js#L3)
+https://github.com/flmeHashira/Clip-Sync/blob/0b7230426b1c747eebd9427027273d8ea6f52a83/realmAPIs.js#L3
 
-```js
-const realmApp = new Realm.App({ id: "<yourAppId>" })
-```
 
 1. Add Schema:
 	Copy paste the following schema in the `Schema` tab under `DATA ACCESS` section in [App Services](https://realm.mongodb.com)

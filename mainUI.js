@@ -32,6 +32,7 @@ const createCardIMG = async(msg) => {
     let container = document.querySelector(".container")
     let card_outer = document.createElement('div')
     card_outer.className = 'card-outer'
+    card_outer.setAttribute("id",id);
 
     let del_btn = document.createElement('div')
     del_btn.className = 'delete-btn'
@@ -96,6 +97,7 @@ document.querySelector('.container').addEventListener("click", (e) => {
 })
 
 function deleteCard(card_elem)  {
+    console.log(card_elem)
     window.electron.ipc.send('delete-clipboard', card_elem.id)
 }
 

@@ -82,14 +82,14 @@ function createWindow() {
 function helperWindow() {
     // create hidden worker window
     workerWindow = new BrowserWindow({
-        show: true,
+        show: false,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
 
         }
     })
-    workerWindow.webContents.openDevTools()
+    // workerWindow.webContents.openDevTools()
     workerWindow.loadFile('worker.html')
 }
 
@@ -167,7 +167,7 @@ function clip() {
         }
 
     })
-    mainWindow.webContents.openDevTools()
+    // mainWindow.webContents.openDevTools()
     mainWindow.loadFile('Main.html')
     workerWindow.webContents.send('load-all-prev')
 

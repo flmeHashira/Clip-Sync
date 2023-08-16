@@ -128,7 +128,9 @@ ipc.on('write-clipboard', (event, message) => {
 })
 
 ipc.on('delete-clipboard', async (event, message) => {
+    console.log(message)
     let uuid = new UUID(message)
+    console.log(uuid)
     const card = await realm.objects("clipContent").filtered("_id == $0", uuid)
     realm.write(async() => {
         await realm.delete(card)

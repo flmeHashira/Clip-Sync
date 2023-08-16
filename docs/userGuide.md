@@ -7,6 +7,8 @@
 ### Setup App and device sync:
 Insert your app id obtained [here](https://www.mongodb.com/docs/atlas/app-services/apps/metadata/#std-label-find-your-app-id) in place of `<yourAppId>`  in RealmAPIs.
 
+[https://github.com/flmeHashira/Clip-Sync/blob/0b7230426b1c747eebd9427027273d8ea6f52a83/realmAPIs.js](https://github.com/flmeHashira/Clip-Sync/blob/0b7230426b1c747eebd9427027273d8ea6f52a83/realmAPIs.js#L3)
+
 ```js
 const realmApp = new Realm.App({ id: "<yourAppId>" })
 ```
@@ -42,8 +44,9 @@ const realmApp = new Realm.App({ id: "<yourAppId>" })
 2. add preset `readOwnWriteOwn` [rule](https://realm.mongodb.com) to the database
 3. Enable Device Sync:
 	1. Turn on Device Sync with partition selected as `Flexible`
-	2. Add the followings in Configure Queryable field: `_id`, `type`, `owner_id`
+	2. Add the followings in Configure Queryable field: `_id`, `type`, `owner_id`  
 	   
-![Sync _ App Services (1)](https://github.com/flmeHashira/checl/assets/108903054/9b0f4176-1c24-455c-9d7b-c9d7e63bd72d)
+![Sync _ App Services (1)](https://github.com/flmeHashira/Clip-Sync/assets/108903054/d3812661-56f5-49d2-b63a-a34d41c4be4d)
 
-### You're all set! 🎉
+
+# You're all set! 🎉

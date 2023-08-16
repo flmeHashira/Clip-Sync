@@ -1,6 +1,6 @@
 # Clip-Sync
 
-Clip-Sync is a realtime clipboard sync App based on Electron and Realm
+Clip-Sync is a realtime clipboard sync App based on Electron and Realm.
 
 ### Features
 
@@ -33,7 +33,12 @@ Clip-Sync is a realtime clipboard sync App based on Electron and Realm
 - **[Node.js](https://nodejs.org/en):** JavaScript runtime for app logic.
 - **HTML/CSS:** Building the awesome UI.
 
-## App Previews 📸
+## Demo
+
+
+https://github.com/flmeHashira/Clip-Sync/assets/108903054/5831eef6-1da4-4ef6-8b69-d069def5a8d3
+
+
 <img width="1440" alt="Screenshot 1" src="https://github.com/flmeHashira/Clip-Sync/assets/108903054/c8b7404e-20c1-48cd-9b35-199593dab349">
 
 <img width="1440" alt="Screenshot 2" src="https://github.com/flmeHashira/Clip-Sync/assets/108903054/7a5cb2d1-345a-447c-89c8-9aa59805953d">
